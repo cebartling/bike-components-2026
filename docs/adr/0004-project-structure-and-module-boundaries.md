@@ -85,7 +85,7 @@ Module names:
 
 - **Easier:** reviewing the layering, which is one table of dependencies in `Package.swift`; adding a module, which is a text edit; keeping views away from adapters, which the compiler checks; adding files, which usually leaves the `.pbxproj` alone.
 - **Harder:** the `.pbxproj` can't be generated, so its rare changes have to be made in Xcode and reviewed as they are. Tests need a simulator, so they're slower to start than `swift test` on the Mac.
-- **Skeleton.** A follow-up issue creates the project, the package with `BikeComponentsCore` and `BikeComponentsUI` and their test targets, and the app's shared scheme. It adds the build and test commands, including running a single test, to `README.md` and `CLAUDE.md`.
+- **Skeleton.** A follow-up issue creates the project, the package with `BikeComponentsCore` and `BikeComponentsUI` and their test targets, and the app's shared scheme. It adds the build and test commands, including running a single test, to `README.md` and `CLAUDE.md`. Xcode's app template sets concurrency build settings, and test targets need a framework, so the skeleton waits for concurrency (#11) and testing (#16) rather than letting the template decide them. Each module it creates holds real first code, such as a first domain type with its test, not an empty placeholder.
 - **CI (#2)** runs `xcodebuild test` against the package's `BikeComponentsKit` scheme on an iOS Simulator, and builds the app with `BikeComponents.xcodeproj` and its shared scheme.
 - **Concurrency (#11)** sets language mode and default isolation per target in `Package.swift` and in the app target's settings.
 - **Persistence (#12).** The store's framework or package is imported only by `BikeComponentsPersistence`.
