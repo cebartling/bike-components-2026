@@ -38,7 +38,7 @@ We will use a thin, hand-made Xcode project for the app target and put every mod
 - **Naming.** Every module name starts with `BikeComponents`, as in the reference project, so names don't collide with system frameworks, packages or each other. A module's test target is the module name plus `Tests`, e.g. `BikeComponentsCoreTests`. `BikeComponentsUITests` is the unit test target of `BikeComponentsUI`. If an Xcode UI test target is added (#16), it gets a name that can't be mistaken for that one.
 - **Folders.** The package follows SwiftPM's defaults: `BikeComponentsKit/Sources/<Module>/` and `BikeComponentsKit/Tests/<Module>Tests/`. App sources and app resources (asset catalog, `Info.plist` and entitlements, if any) live in `BikeComponents/`. Folders inside a module group code by feature or concept, with no rule set here.
 - **Each library module has its own test target** in the package, depending on that module and on Core only where it needs Core's types. Test targets that need fakes of Core's ports get them as #16 decides.
-- **Tests run on an iOS Simulator through the Xcode project.** The app's shared scheme, committed under `BikeComponents.xcodeproj/xcshareddata/`, runs every test target in the package. CI and local runs use the same `xcodebuild test` invocation against that scheme. The exact commands, including how to run a single test, are added to `README.md` and `CLAUDE.md` with the skeleton. `swift build` and `swift test` on the Mac aren't a supported way to build or test. Listing only iOS in `platforms` sets iOS's minimum but doesn't stop SwiftPM building the package for macOS at a default minimum, so `swift test` may well run. It runs on macOS, which ADR-0002 doesn't support, so a pass there says nothing about iOS.
+- **Tests run on an iOS Simulator through the package's scheme.** Xcode generates a scheme for the package, `BikeComponentsKit`, whose Test action includes every `.testTarget` in `Package.swift`. A new test target therefore runs without anyone editing a scheme (checked with Xcode 27.2). CI and local runs use the same `xcodebuild test` invocation against that scheme, run from `BikeComponentsKit/`. The app's shared scheme, committed under `BikeComponents.xcodeproj/xcshareddata/`, builds and runs the app, and CI builds it too. The exact commands, including how to run a single test, are added to `README.md` and `CLAUDE.md` with the skeleton. `swift build` and `swift test` on the Mac aren't a supported way to build or test. Listing only iOS in `platforms` sets iOS's minimum but doesn't stop SwiftPM building the package for macOS at a default minimum, so `swift test` may well run. It runs on macOS, which ADR-0002 doesn't support, so a pass there says nothing about iOS.
 - **Build settings.** Package targets set their Swift settings (for example language mode and default isolation, decided in #11) in `Package.swift`. App target settings live in the Xcode project. Signing and build configurations are decided in #21.
 - **Third-party packages.** Any package dependency is declared in `Package.swift` and used only by the module that needs it, under the dependency policy (#8). The app target depends on no third-party package directly.
 
@@ -56,6 +56,11 @@ Package layout:
 - **One package with many targets (chosen).** One manifest shows every module and dependency, as in the reference project.
 - **One package per module.** Each module would get its own manifest and version of the same settings, linked by relative paths. It suits modules shared between apps, which this project doesn't have.
 - **`Package.swift` at the repository root, next to the project.** It saves a folder, but mixes the package's files with the project's and the app's at one level. A `BikeComponentsKit/` folder keeps them apart.
+
+Where tests run:
+
+- **The package's generated scheme (chosen).** It picks up every test target in `Package.swift` by itself.
+- **The app's shared scheme.** One scheme would build the app and run the tests, but package test targets join its Test action only when someone adds them in Xcode's scheme editor. A test target added to `Package.swift` alone would never run, while CI stayed green.
 
 Where the UI lives:
 
@@ -78,8 +83,8 @@ Module names:
 
 - **Easier:** reviewing the layering, which is one table of dependencies in `Package.swift`; adding a module, which is a text edit; keeping views away from adapters, which the compiler checks; adding files without touching the `.pbxproj`.
 - **Harder:** the `.pbxproj` can't be generated, so its rare changes have to be made in Xcode and reviewed as they are. Tests need a simulator, so they're slower to start than `swift test` on the Mac.
-- **Skeleton.** A follow-up issue creates the project, the package with `BikeComponentsCore` and `BikeComponentsUI` and their test targets, and the shared scheme. It adds the build and test commands, including running a single test, to `README.md` and `CLAUDE.md`.
-- **CI (#2)** runs `xcodebuild` against `BikeComponents.xcodeproj` and its shared scheme on an iOS Simulator.
+- **Skeleton.** A follow-up issue creates the project, the package with `BikeComponentsCore` and `BikeComponentsUI` and their test targets, and the app's shared scheme. It adds the build and test commands, including running a single test, to `README.md` and `CLAUDE.md`.
+- **CI (#2)** runs `xcodebuild test` against the package's `BikeComponentsKit` scheme on an iOS Simulator, and builds the app with `BikeComponents.xcodeproj` and its shared scheme.
 - **Concurrency (#11)** sets language mode and default isolation per target in `Package.swift` and in the app target's settings.
 - **Persistence (#12).** The store's framework or package is imported only by `BikeComponentsPersistence`.
 - **State management (#14)** decides the presentation pattern inside `BikeComponentsUI`, and whether presentation code needs a module of its own.

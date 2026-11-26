@@ -34,7 +34,7 @@ The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` a
   - `BikeComponents.xcodeproj` at the repo root holds one app target, `BikeComponents`, whose sources are a buildable folder, `BikeComponents/`. It holds only `@main` and the composition root: no views, presentation code or domain logic. Change the project in Xcode, never by hand-editing the `.pbxproj` or with a generator.
   - Every module lives in the local package `BikeComponentsKit/` (`Sources/<Module>/`, `Tests/<Module>Tests/`), iOS only. Modules: `BikeComponentsCore` (Foundation only), `BikeComponentsUI` (views and presentation code; depends on Core only), `BikeComponentsPersistence` and `BikeComponentsStrava` (driven adapters; depend on Core). Only the app target depends on adapter modules. Create a module with its first code, and give each library module a `<Module>Tests` test target.
   - A third-party package is used only by the module that needs it, never by the app target directly.
-  - Tests run on an iOS Simulator with `xcodebuild` through the app's shared scheme. `swift build` and `swift test` on the Mac are not supported: they may build and pass, but they test macOS, which isn't a supported platform, so don't rely on them.
+  - Tests run on an iOS Simulator with `xcodebuild test` against the package's generated `BikeComponentsKit` scheme, from `BikeComponentsKit/`, which picks up every `.testTarget` by itself. The app's shared scheme only builds and runs the app. `swift build` and `swift test` on the Mac are not supported: they may build and pass, but they test macOS, which isn't a supported platform, so don't rely on them.
 
 ## Open decisions
 
