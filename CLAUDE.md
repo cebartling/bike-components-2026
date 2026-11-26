@@ -22,6 +22,13 @@ The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` a
 ## Decided
 
 - Platforms: iPhone and iPad, one universal iOS app target. Only the latest OS release is supported, down to the point release, currently iOS/iPadOS 27.2. The minimum always equals the SDK we build with, so never write `#available` checks or fallbacks, not even for point-release APIs. When a new OS release (major or point) ships, the toolchain and minimum move up together. Not macOS, visionOS, watchOS or tvOS. Audience is the author plus TestFlight testers. UIKit only where SwiftUI has no equivalent, wrapped in the UI layer. (ADR-0002)
+- Architecture: hexagonal (ports and adapters). Layering rules (ADR-0003):
+  - Core (the domain module; name and packaging decided in #10) holds the domain model, its rules (wear, service intervals, Strava import reconciliation) and the driven ports. It imports Foundation only: no SwiftUI, UIKit, Observation, SwiftData, Core Data, AuthenticationServices, Security or packages. It does no I/O (`URLSession`, `FileManager`, `UserDefaults`) and never reads the clock or system randomness: pass the date in as a parameter.
+  - Core types are plain value types, never `@Model`, managed objects, SQLite records or Strava JSON types. Adapters map at their boundary. Invariants such as unique Strava gear IDs are enforced in Core.
+  - Driven ports are protocols owned by Core, named for the role (`BikeRepository`, `RideRepository`, `BikeSource`, `RideSource`). Add a port only when Core needs one. Use cases have no protocols: callers use Core's concrete types.
+  - Adapters (persistence, Strava, the SwiftUI UI) depend on Core; Core depends on nothing but Foundation. Each driven adapter is its own module, created when its first code is written. Adapter-internal seams (HTTP transport, Keychain token store) stay inside the adapter; Strava tokens never enter Core.
+  - The app target is the composition root. Core gets ports through initializers or parameters, never from singletons, globals or service locators.
+  - Core is tested through in-memory fakes of its ports: no UI, disk, network or real clock. No automated import check exists yet, so check Core's imports by hand.
 
 ## Open decisions
 
