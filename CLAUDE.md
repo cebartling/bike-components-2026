@@ -11,7 +11,7 @@ A bike components inventory app built in Swift and SwiftUI.
 Use [investment-simulator-2026](https://github.com/cebartling/investment-simulator-2026) (same author, MIT, checked out next to this repo at `../investment-simulator-2026`) for examples and code reuse. Before writing an ADR or a component, check whether it has already solved the same problem:
 
 - ADRs in `docs/adr/`, e.g. hexagonal architecture, Swift 6 concurrency, `@Observable` presentation models and injection, Swift Testing, CI, release
-- Code such as the `HTTPTransport` test seam, the Keychain-backed `CredentialStoring` port, the `justfile` and the GitHub Actions workflows
+- Code such as the `HTTPTransport` test seam, the Keychain code behind its `CredentialStoring` port (here a token store inside the Strava adapter, not a Core port: ADR-0003), the `justfile` and the GitHub Actions workflows
 
 Reuse what fits, and record where this project diverges and why. It is a macOS-only, SwiftPM-only app, so its build, bundle, window and distribution choices don't carry over to this iOS app (ADR-0002). Each ADR issue (#7 to #22) lists the relevant prior art.
 
