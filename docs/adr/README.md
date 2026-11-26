@@ -8,6 +8,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | --- | --- | --- | --- |
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted | 2026-11-26 |
 | [0002](0002-target-platforms-and-minimum-os-versions.md) | Target platforms and minimum OS versions | Accepted | 2026-11-26 |
+| [0003](0003-hexagonal-architecture.md) | Hexagonal architecture (ports and adapters) | Accepted | 2026-11-26 |
 
 ## Adding an ADR
 
