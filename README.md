@@ -4,16 +4,16 @@ A bike components inventory app built in Swift and SwiftUI.
 
 ## Status
 
-Early setup. There is no app code yet. The basic architecture (platforms, persistence, project structure, testing) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
+Early setup. There is no app code yet. The basic architecture (persistence, project structure, testing and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
 
 ## Requirements
 
 | Requirement | Value |
 | --- | --- |
-| Xcode | TBD |
+| Xcode | 27.2, the version that ships the latest iOS SDK ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
 | Swift | TBD |
-| Target platforms | TBD (pending ADR) |
-| Minimum OS versions | TBD (pending ADR) |
+| Target platforms | iPhone and iPad ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
+| Minimum OS versions | iOS 27.2, iPadOS 27.2: latest release only, including point releases ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
 
 ## Build, run and test
 

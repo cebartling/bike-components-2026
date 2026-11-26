@@ -13,19 +13,22 @@ Use [investment-simulator-2026](https://github.com/cebartling/investment-simulat
 - ADRs in `docs/adr/`, e.g. hexagonal architecture, Swift 6 concurrency, `@Observable` presentation models and injection, Swift Testing, CI, release
 - Code such as the `HTTPTransport` test seam, the Keychain-backed `CredentialStoring` port, the `justfile` and the GitHub Actions workflows
 
-Reuse what fits, and record where this project diverges and why. It is a macOS-only, SwiftPM-only app, so its build, bundle, window and distribution choices may not carry over if this app targets iOS. Each ADR issue (#7 to #22) lists the relevant prior art.
+Reuse what fits, and record where this project diverges and why. It is a macOS-only, SwiftPM-only app, so its build, bundle, window and distribution choices don't carry over to this iOS app (ADR-0002). Each ADR issue (#7 to #22) lists the relevant prior art.
 
 ## Current state
 
 The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` and the docs in `docs/`. There is no Xcode project, Swift package, source code, build tooling or test target yet, so there are no build, lint or test commands. Once a project is added, update this file with them, including how to run a single test.
 
+## Decided
+
+- Platforms: iPhone and iPad, one universal iOS app target. Only the latest OS release is supported, down to the point release, currently iOS/iPadOS 27.2. The minimum always equals the SDK we build with, so never write `#available` checks or fallbacks, not even for point-release APIs. When a new OS release (major or point) ships, the toolchain and minimum move up together. Not macOS, visionOS, watchOS or tvOS. Audience is the author plus TestFlight testers. UIKit only where SwiftUI has no equivalent, wrapped in the UI layer. (ADR-0002)
+
 ## Open decisions
 
-The basic architecture is still undecided. Don't assume any of the following until an ADR records it:
+Much of the architecture is still undecided. Don't assume any of the following until an ADR records it:
 
-- target platforms and minimum OS versions
 - persistence (SwiftData, Core Data or SQLite)
-- project structure (Xcode project or Swift Package modules)
+- project structure (hand-made Xcode project or a generator, with or without local Swift packages)
 - testing framework (Swift Testing or XCTest)
 - sync/backup
 
