@@ -17,12 +17,14 @@ Forces at play:
 
 ## Decision
 
+We will build one universal SwiftUI app for iPhone and iPad, on the terms below.
+
 - **Platforms: iPhone and iPad.** The app is one universal iOS app that supports both device families.
 - **One target, not one per platform.** A single SwiftUI app target serves iPhone and iPad and adapts to size classes and window sizes. There is no separate iPad target.
 - **Only the latest OS is supported. Today that means a minimum of iOS 27 and iPadOS 27.** Observation, SwiftData, Liquid Glass and every API in the current SDK are available without availability checks or fallbacks.
 - **Not targeted:** macOS (including Mac Catalyst and running the iPad app on Apple silicon Macs), visionOS, watchOS and tvOS. These are not built, tested or supported. Adding one takes a new ADR.
 - **Audience: the author and TestFlight testers.** There is no plan for an App Store release. Changing that takes a new ADR. Release mechanics are decided in #21.
-- **Raising the minimum OS.** The minimum follows the latest major release. When a new major version ships (e.g. iOS 28), we move the toolchain to the Xcode that ships with it and raise the minimum to match, in the same change. That change updates the project's deployment target and `README.md`. It needs no new ADR, because this ADR sets the policy. Lowering the minimum, or supporting more than the latest major release, does need a new ADR.
+- **Raising the minimum OS.** The minimum follows the latest major release. When a new major version ships (e.g. iOS 28), we move the toolchain to the Xcode that ships with it and raise the minimum to match, in the same change. That change updates the deployment target of every app target and local Swift package (the `platforms` in each `Package.swift`), the Xcode version CI builds with, `README.md` and `CLAUDE.md`. It needs no new ADR, because this ADR sets the policy. Lowering the minimum, or supporting more than the latest major release, does need a new ADR.
 - **UIKit interop.** SwiftUI is the default. `UIViewRepresentable` and `UIViewControllerRepresentable` are allowed only where SwiftUI has no equivalent. Each use is wrapped in a small, dedicated type in the UI layer, with a comment saying which SwiftUI gap it fills. No UIKit types appear outside the UI layer. OAuth doesn't need UIKit: SwiftUI's `webAuthenticationSession` environment value drives `ASWebAuthenticationSession`.
 
 ## Consequences
@@ -34,7 +36,7 @@ Forces at play:
 - **No compatibility code.** There are no `#available` checks or fallback paths for older OS versions. Every new API in the latest SDK can be used as soon as the minimum is raised.
 - **Yearly upgrade work.** Each new major release brings a toolchain upgrade and a minimum-OS bump. Any deprecations and new warnings have to be dealt with then, not deferred.
 - **Navigation (#17).** iPad needs adaptive layouts, likely `NavigationSplitView`, and must handle any window size, because iPadOS windows can be freely resized (since iPadOS 26). macOS window and scene layout is out of scope.
-- **Release (#21).** Distribution is through TestFlight, which needs an Apple Developer Program membership and App Store Connect. The reference project's Developer ID, notarization and GitHub Releases path doesn't apply.
+- **Release (#21).** Distribution is through TestFlight, which needs an Apple Developer Program membership and App Store Connect. The reference project's Developer ID, notarization and GitHub Releases path doesn't apply. App Store Connect offers iPhone and iPad apps on Apple silicon Macs and Apple Vision Pro by default, so both have to be turned off for this app to keep it off platforms it doesn't support. TestFlight builds expire 90 days after upload, so a new build has to reach testers at least that often or the app stops opening.
 - **Strava (#3).** The iOS OAuth plan stands. Because TestFlight puts the app on other people's devices, the client secret question in #3 needs an answer before the app reaches testers.
 - **Audience.** Testers must run the latest major iOS or iPadOS release, and update each year when a new one ships. Devices that can't run the latest release lose support.
 - **Requirements.** `README.md` records the platforms and minimum OS versions.
