@@ -78,6 +78,7 @@ Module names:
 - **Build.** The reference project has no Xcode project and builds with SwiftPM alone. Here an Xcode project builds the app and runs the tests on a simulator, because an iOS app needs one (ADR-0002).
 - **Views.** The reference project's views sit in its executable target, which imports every adapter. Here they sit in `BikeComponentsUI`, which can't.
 - **Platforms.** The reference package targets macOS, and `swift test` is its test command. This package lists only iOS. SwiftPM could still build it for macOS, but `swift test` isn't a supported check here.
+- **Task runner.** The reference project's `justfile` is the single entry point for every build, test and release command. This ADR doesn't adopt one. Whether to wrap the `xcodebuild` commands in a `justfile` is left to CI (#2), since `just` is a tool under the dependency policy (#8).
 - **Xcode.** The reference project doesn't use the Xcode IDE and has no `#Preview` blocks for that reason. Here the Xcode IDE is used, so previews are possible. Whether to write them is left to the UI ADRs.
 
 ## Consequences
