@@ -21,7 +21,7 @@ The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` a
 
 ## Decided
 
-- Platforms: iPhone and iPad, one universal iOS app target, minimum iOS/iPadOS 26. Not macOS, visionOS, watchOS or tvOS. Audience is the author plus TestFlight testers. UIKit only where SwiftUI has no equivalent, wrapped in the UI layer. (ADR-0002)
+- Platforms: iPhone and iPad, one universal iOS app target. Only the latest OS is supported, currently iOS/iPadOS 27, so never write `#available` checks or fallbacks for older versions. When a new major OS ships, the toolchain and minimum move up together. Not macOS, visionOS, watchOS or tvOS. Audience is the author plus TestFlight testers. UIKit only where SwiftUI has no equivalent, wrapped in the UI layer. (ADR-0002)
 
 ## Open decisions
 

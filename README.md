@@ -13,7 +13,7 @@ Early setup. There is no app code yet. The basic architecture (persistence, proj
 | Xcode | TBD |
 | Swift | TBD |
 | Target platforms | iPhone and iPad ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
-| Minimum OS versions | iOS 26, iPadOS 26 ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
+| Minimum OS versions | iOS 27, iPadOS 27: latest release only ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
 
 ## Build, run and test
 
