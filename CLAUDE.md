@@ -27,6 +27,7 @@ The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` a
   - Core types are plain value types, never `@Model`, managed objects, SQLite records or Strava JSON types. Adapters map at their boundary. Invariants such as unique Strava gear IDs are enforced in Core.
   - Driven ports are protocols owned by Core, named for the role (`BikeRepository`, `RideRepository`, `BikeSource`, `RideSource`). Add a port only when Core needs one. Use cases have no protocols: callers use Core's concrete types.
   - Adapters (persistence, Strava, the SwiftUI UI) depend on Core; Core depends on nothing but Foundation. Each driven adapter is its own module, created when its first code is written. Adapter-internal seams (HTTP transport, Keychain token store) stay inside the adapter; Strava tokens never enter Core. Strava connect, disconnect and connection state go through a Core port (named in #3) that the Strava adapter implements.
+  - Views and presentation code use Core's types and ports only, never a driven adapter module. Only the composition root imports adapters.
   - The app target is the composition root. Core gets ports through initializers or parameters, never from singletons, globals or service locators.
   - Core is tested through in-memory fakes of its ports: no UI, disk, network or real clock. No automated import check exists yet, so check Core's imports by hand.
 
