@@ -19,11 +19,14 @@ Reuse what fits, and record where this project diverges and why. It is a macOS-o
 
 The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` and the docs in `docs/`. There is no Xcode project, Swift package, source code, build tooling or test target yet, so there are no build, lint or test commands. Once a project is added, update this file with them, including how to run a single test.
 
+## Decided
+
+- Platforms: iPhone and iPad, one universal iOS app target, minimum iOS/iPadOS 26. Not macOS, visionOS, watchOS or tvOS. Audience is the author plus TestFlight testers. UIKit only where SwiftUI has no equivalent, wrapped in the UI layer. (ADR-0002)
+
 ## Open decisions
 
-The basic architecture is still undecided. Don't assume any of the following until an ADR records it:
+Much of the architecture is still undecided. Don't assume any of the following until an ADR records it:
 
-- target platforms and minimum OS versions
 - persistence (SwiftData, Core Data or SQLite)
 - project structure (Xcode project or Swift Package modules)
 - testing framework (Swift Testing or XCTest)

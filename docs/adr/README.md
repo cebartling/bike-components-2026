@@ -7,6 +7,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | Number | Title | Status | Date |
 | --- | --- | --- | --- |
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted | 2026-11-26 |
+| [0002](0002-target-platforms-and-minimum-os-versions.md) | Target platforms and minimum OS versions | Accepted | 2026-11-26 |
 
 ## Adding an ADR
 
