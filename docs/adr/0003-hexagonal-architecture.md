@@ -72,8 +72,9 @@ A feature that touches only domain logic and UI needs no port and no new module.
 - **Persistence (#12).** Whichever store is chosen, its types stay inside the persistence adapter and are mapped to Core types. With SwiftData, views can't use `@Query` and `@Model` objects never reach the UI, so much of its convenience over Core Data or GRDB is lost. #12 should weigh that.
 - **Project structure (#10).** The structure has to provide Core as a module that depends on no adapter and not on the app, plus one module per driven adapter, each with its own test target.
 - **Concurrency (#11).** Decides the isolation of Core's types and whether ports are `async` and `Sendable`.
-- **State management (#14) and dependency injection (#15).** The presentation layer depends on Core and its ports, not on adapter modules. Ports are what the composition root injects.
-- **Testing (#16).** Core is tested with in-memory fakes of its ports. Adapters are tested on their own: persistence against an in-memory store, Strava against fixture JSON through an injected transport.
+- **State management (#14).** The presentation layer depends on Core and its ports, not on adapter modules.
+- **Dependency injection (#15).** This ADR settles two things: the composition root is the app target, and Core gets no adapter from a singleton, global or service locator. Ports are what the composition root injects. #15 still decides the mechanism outside Core and any singleton rule for the rest of the app.
+- **Testing (#16).** This ADR settles that Core is tested with in-memory fakes of its ports. #16 decides the rest, including how adapters are tested. The expectation is persistence against an in-memory store, and Strava against fixture JSON through an injected transport.
 - **Follow-up:** an automated check that Core imports only Foundation, such as the reference project's lint rule or a script in CI (#2), once the tooling is decided. Until then, code review enforces it.
 - **Revisit:** whether one module per driven adapter stays worthwhile, and whether `BikeRepository` should be split, once real code exists.
 - **Agents.** `CLAUDE.md` records the layering rules.
