@@ -27,6 +27,27 @@ We will build one universal SwiftUI app for iPhone and iPad, on the terms below.
 - **Raising the minimum OS.** The minimum follows the latest release, major or point. When a new release ships with its SDK (e.g. iOS 27.3 or iOS 28), we move the toolchain to the Xcode that ships that SDK and raise the minimum to match, in the same change. That change updates the deployment target of every app target and local Swift package (the `platforms` in each `Package.swift`, written as a string such as `.iOS("27.2")` because the version constants cover only major releases), the Xcode version CI builds with, `README.md` and `CLAUDE.md`. It needs no new ADR, because this ADR sets the policy. Lowering the minimum, or supporting more than the latest release, does need a new ADR.
 - **UIKit interop.** SwiftUI is the default. `UIViewRepresentable` and `UIViewControllerRepresentable` are allowed only where SwiftUI has no equivalent. Each use is wrapped in a small, dedicated type in the UI layer, with a comment saying which SwiftUI gap it fills. No UIKit types appear outside the UI layer. OAuth doesn't need UIKit: SwiftUI's `webAuthenticationSession` environment value drives `ASWebAuthenticationSession`.
 
+### Options considered
+
+Platforms:
+
+- **iPhone only.** Smallest scope, but iPad would run the app in compatibility mode. With one universal target, supporting iPad properly costs adaptive layouts, not a second app.
+- **iPhone, iPad and Mac (one multiplatform target).** Most reach, but adds Mac navigation, window and scene layout, and a second distribution path. Mac Catalyst and running the iPad app on Apple silicon Macs were rejected for the same reason: they still make the Mac a supported platform.
+- **Mac only.** Would reuse the reference project's build, CI and release almost unchanged, but the Strava sign-in plan in #3 is written for iOS and would need rework.
+- **A separate iPad target.** A single target already adapts to size classes and window sizes. A second one would duplicate configuration for no gain.
+
+Minimum OS:
+
+- **iOS 17.** The lowest version with Observation and SwiftData. Widest reach, but Liquid Glass and every newer API would need availability checks and fallbacks.
+- **One release behind the current one (iOS 26).** This was the first proposal. It was rejected in favor of supporting only the latest release, which removes compatibility code entirely.
+- **Latest major release only (iOS 27.0).** APIs added in point releases would need `#available` checks, or would have to wait for the next major release. Tracking the point release avoids both.
+- **Raise the minimum only when a newer API is worth it, with a new ADR each time.** Replaced by the latest-release policy, which needs no ADR per bump.
+
+Audience:
+
+- **The author only.** Not chosen: builds are shared with TestFlight testers.
+- **App Store release.** Not planned. It would need a backend for the Strava token exchange (#3), App Review, and a review of Strava's API agreement.
+
 ## Consequences
 
 - **Project structure (#10).** An iOS app can't be built with SwiftPM alone, as the reference project does for macOS. The app needs an Xcode project or a project generator. Local Swift packages for the domain and adapters remain possible.
