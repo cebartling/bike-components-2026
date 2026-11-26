@@ -22,7 +22,7 @@ We will use a thin, hand-made Xcode project for the app target and put every mod
 
 - **The Xcode project holds only the app.** `BikeComponents.xcodeproj` at the repository root has one app target, `BikeComponents`, whose sources sit in a buildable folder, `BikeComponents/`. Adding, moving or removing a source file doesn't change the `.pbxproj`. The project changes only for target settings, capabilities, resources such as the app icon, and new targets. It is edited in Xcode, not by hand or by a generator.
 - **The app target is the composition root and nothing else.** It holds the `@main` app type and the code that builds the adapters and hands them to Core and the UI. No views, presentation code or domain logic live there.
-- **One local Swift package holds the modules.** The package `BikeComponentsKit` lives in `BikeComponentsKit/` at the repository root, and the app target depends on its library products. Its `platforms` lists iOS only, at the minimum ADR-0002 sets (`.iOS("27.2")` today).
+- **One local Swift package holds the modules.** The package `BikeComponentsKit` lives in `BikeComponentsKit/` at the repository root. It exposes one library product, also `BikeComponentsKit`, that lists every library target, and the app target links only that product. Adding a module then edits `Package.swift` alone, not the Xcode project. The product decides only what the app links. The layering is enforced by the dependencies each target declares. Its `platforms` lists iOS only, at the minimum ADR-0002 sets (`.iOS("27.2")` today).
 - **Modules and their dependencies:**
 
   | Module | Holds | Depends on |
