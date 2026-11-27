@@ -38,7 +38,7 @@ We will inject every dependency through initializers, with the app target as the
 
 ### Child models
 
-- **Factory closures, written by the composition root.** A model or view that builds another screen's model is given a closure that takes only the inputs that vary, such as `makeDetailModel: (Bike.ID) -> BikeDetailModel`. The composition root writes the closure, capturing the ports and the factories the child needs in turn. A parent holds only what it uses itself, and the whole graph is in one place.
+- **Factory closures, written by the composition root.** A model or view that builds another screen's model is given a closure that takes only the inputs that vary, such as `makeDetailModel: (UUID) -> BikeDetailModel`, given the bike's domain `UUID` (ADR-0007). The composition root writes the closure, capturing the ports and the factories the child needs in turn. A parent holds only what it uses itself, and the whole graph is in one place.
 - **One way, even when the parent could build the child.** A parent that already holds the ports its child needs is still given a factory, so there is one rule to follow and a child's new dependency changes only the composition root.
 - **Tests pass a closure too.** A parent model's test builds the child over the same fakes in the closure it passes, or records the inputs it was called with.
 
