@@ -45,6 +45,8 @@ We will store the app's data in one app-wide SwiftData store, behind Core's repo
 
 - **Core enforces uniqueness** (ADR-0003). The store has no `@Attribute(.unique)` or `#Unique`: CloudKit rejects them, and a duplicate insert silently overwrites the earlier object (see Context), which would hide a Core bug instead of catching it.
 - **Writes upsert by the domain ID.** Saving a value fetches the record with its `UUID`, updates it if found and inserts it otherwise. Core's import reconciles Strava gear and activity IDs with what it loaded through the ports, and then saves.
+- **One import at a time.** Core's check and its save are separate port calls, so two overlapping imports could each insert a bike for the same new gear ID. Only one import runs at a time. Whoever starts imports guarantees that, decided with #3's sync model.
+- **The adapter checks gear IDs too.** Saving a bike also fetches by its gear ID in the same actor call, and throws a descriptive error if a bike with another `UUID` holds it. This is a fetch, not a store constraint, so CloudKit stays open. ADR-0003 allows the store to enforce uniqueness as well as Core.
 
 ### Threading
 
@@ -77,7 +79,7 @@ Store isolation:
 ### Where this diverges from the reference project
 
 - **Store.** The reference project uses GRDB. Here SwiftData wins because the SDK can do the job (ADR-0006) and because this app runs on two kinds of device, where CloudKit sync matters. The reference project is one Mac with no sync. Its objection that SwiftData pulls persistence into the domain doesn't apply here: ADR-0003 maps at the adapter, as it does with GRDB.
-- **Uniqueness.** The reference project can rely on SQLite constraints. Here the store has none, to keep CloudKit open, and Core is the one place uniqueness is enforced.
+- **Uniqueness.** The reference project can rely on SQLite constraints. Here the store has none, to keep CloudKit open. Core enforces uniqueness, and the adapter checks gear IDs with a fetch when it saves a bike.
 - **Kept:** one app-wide store, the store's types only in the persistence adapter, and failing fast without recreating the store.
 - **ADR-0005's example.** ADR-0005 named SwiftData's `ModelActor` as an example of the adapter's isolation. This ADR uses a plain actor instead, for the reason above.
 
