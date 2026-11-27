@@ -28,6 +28,7 @@ We will sync the whole store across the user's devices with SwiftData's CloudKit
 ### Scope
 
 - **CloudKit mirroring of the whole store.** Bikes, rides, components, installations and service records all sync. A new or replaced device gets the data back from iCloud once the user signs in with the same Apple Account. Device backup still covers Application Support, as before.
+- **Per-device state stays out of the store.** State that belongs to one device, such as an import's resume point or its last sync time, isn't kept in the synced store, or every device would inherit it. Where it lives is decided with #3.
 - **The private database only.** No sharing between users and no public data.
 - **No export yet.** There is no user-initiated export or import file. See Consequences.
 
