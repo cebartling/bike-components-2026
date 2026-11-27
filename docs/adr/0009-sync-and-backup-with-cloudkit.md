@@ -1,4 +1,4 @@
-# 8. Sync and backup with CloudKit
+# 9. Sync and backup with CloudKit
 
 - Status: Accepted
 - Date: 2026-11-27
