@@ -36,6 +36,16 @@ The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` a
   - Access control: `package` for what another package module uses, `public` only for what the app target uses, `internal` (or narrower) otherwise.
   - Don't add a third-party package until the dependency policy (#8) is decided. Once one is allowed, only the module that needs it uses it, never the app target directly.
   - Tests run on an iOS Simulator with `xcodebuild test` against the package's generated `BikeComponentsKit` scheme, from `BikeComponentsKit/`, which picks up every `.testTarget` by itself. The app's shared scheme only builds and runs the app. `swift build` and `swift test` on the Mac are not supported: they may build and pass, but they test macOS, which isn't a supported platform, so don't rely on them.
+- Concurrency (ADR-0005):
+  - Swift 6 language mode in every target. Every target enables the upcoming features `NonisolatedNonsendingByDefault` and `InferIsolatedConformances`: package targets through one shared settings list in `Package.swift`, the app target through its explicit `SWIFT_UPCOMING_FEATURE_*` settings (a project change: ask the user). Don't enable other upcoming features without a new ADR.
+  - Default isolation: Core, Persistence and Strava are nonisolated. `BikeComponentsUI` (`.defaultIsolation(MainActor.self)`) and the app target are `MainActor`. A test target uses its module's isolation. In a main-actor module, mark a type `nonisolated` when it has to leave the main actor.
+  - `async` functions run on their caller's actor. Use `@concurrent` only to move work off the caller deliberately.
+  - Core has no actors and no shared mutable state. Domain types are value types that declare `Sendable`. Use cases are `Sendable` structs or functions holding their ports, `async` when they call a port.
+  - Driven ports are `Sendable` protocols, `async` for I/O. Adapters hide their isolation behind the port and never block their caller: put blocking or CPU-heavy work in a `@concurrent` function or on the adapter's own actor. Use an actor for adapter state that concurrent calls share, such as the Strava token store and refresh.
+  - `@unchecked Sendable`, `nonisolated(unsafe)` and `@preconcurrency` only with a comment explaining why the code is safe.
+  - Use structured concurrency (`async let`, task groups). Start unstructured tasks only in the UI layer, preferably with `.task`. No `Task.detached`, Dispatch, completion-handler APIs or Combine. Wrap callback-only framework APIs in checked continuations inside the adapter. Use `AsyncSequence`/`AsyncStream` for values over time, and stop the producer when the consumer is cancelled.
+  - Long-running work (a Strava import) checks for cancellation between pages, keeps what it already saved, and isn't reported to the user as an error when cancelled.
+  - No global mutable state: globals and `static`s are `let`s of `Sendable` types.
 
 ## Open decisions
 
