@@ -31,7 +31,7 @@ We will store the app's data in one app-wide SwiftData store, behind Core's repo
 
 - **One SwiftData store** in the app's Application Support directory, at an explicit file name, `BikeComponents.store`, so its path doesn't depend on SwiftData's default. iOS backs that directory up with the device.
 - **CloudKit stays off until #13.** Every `ModelConfiguration` passes `cloudKitDatabase: .none`, so adding an iCloud entitlement for another reason can't turn sync on.
-- **Only the persistence module imports SwiftData.** Not Core (ADR-0003), not `BikeComponentsUI`, not the app target. The module's public API opens the store and returns the adapter, so the composition root never sees a `ModelContainer`.
+- **Only the persistence module imports SwiftData.** Not Core (ADR-0003), not `BikeComponentsUI`, not the app target. The module's public API opens the store and returns the adapter, so the composition root never sees a `ModelContainer`. The function that opens it is `async` and `@concurrent`, because opening reads the disk and may run a migration, and the composition root is on the main actor (ADR-0005).
 - **Fail fast.** If the store can't be opened or migrated, opening it throws an error naming the path and the underlying error, and the app shows that message instead of continuing. The adapter never deletes or recreates a store it can't open, and never falls back to an empty or in-memory store.
 
 ### Persistence types and mapping
