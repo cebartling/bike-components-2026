@@ -52,7 +52,7 @@ We will store the app's data in one app-wide SwiftData store, behind Core's repo
 
 - **The adapter is one actor that owns its context.** It creates a `ModelContext` from the container in its initializer and keeps both the container and the context, so the context never outlives the container. It is the only code that touches either. It is a plain actor, not a `@ModelActor`, because a `@ModelActor` ran on the main thread when called from the main actor (see Context), which would break ADR-0005's rule that adapters never block their caller.
 - **One actor implements every repository port** (`BikeRepository`, `RideRepository` and any added later), so all reads and writes go through one context, one at a time. Its methods are synchronous inside the actor, and callers reach them with `await` through the `Sendable`, `async` ports.
-- **Every write saves before it returns.** Autosave is off, and each port method that writes calls `save()` once. A port call that returns has written to disk, which is what an interrupted import relies on to resume (ADR-0003, ADR-0005). A page of rides is one call and one save.
+- **Every write saves before it returns.** The adapter sets `autosaveEnabled` to `false` on its context rather than relying on a default, and each port method that writes calls `save()` once. A port call that returns has written to disk, which is what an interrupted import relies on to resume (ADR-0003, ADR-0005). A page of rides is one call and one save.
 - **No undo manager.** The context's `undoManager` stays `nil`.
 
 ### Migrations
