@@ -81,7 +81,7 @@ Strava-sourced data:
 
 - **Sync everything and reconcile duplicates (chosen).** One store, relationships between components and bikes stay relationships, and a device that never connects to Strava still has the rides.
 - **Sync only app-owned data and re-import Strava data on each device.** No duplicate Strava records in CloudKit. Rejected: two configurations, with components referring to bikes by gear ID instead of a relationship, every device needing its own Strava connection and backfill, and a SwiftData forum report that a store without iCloud still synced when another configuration in the container had it.
-- **Derive record IDs from Strava IDs.** Duplicates would share a `UUID`. Rejected: Core is Foundation only and has no name-based UUID, and CloudKit would still hold two records, so reconciliation would still be needed.
+- **Derive record IDs from Strava IDs.** Duplicates would share a `UUID`. Rejected: the mirroring names CloudKit records itself, so two devices would still create two records with the same `UUID`, and upserts by `UUID` would then find two rows. Reconciliation would still be needed.
 - **Import on one designated device.** Fewer duplicates. Rejected: losing that device stops imports until another is designated, and duplicates can still arrive during a change of device.
 
 Conflicts:
