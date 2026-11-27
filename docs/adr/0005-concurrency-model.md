@@ -82,6 +82,8 @@ Values over time:
 - **Upcoming features.** The reference project's package enables none. Here every target enables `NonisolatedNonsendingByDefault`, `InferIsolatedConformances` and `MemberImportVisibility`, so the package matches the Xcode app target, which turns them on through its template.
 - **App target.** The reference project's app is a SwiftPM executable target with `defaultIsolation(MainActor.self)`. Here the app target is in an Xcode project and gets its settings from the project, starting from Xcode's template with the language mode changed to Swift 6.
 - **Adapters.** The reference project's CPU-heavy work is simulation inside Core. Here the work is mostly I/O in the adapters, so the rule that matters is that adapters don't block their caller.
+- **Test targets.** The reference project's presentation test target has no default isolation, and its test suites are marked `@MainActor`. Here a test target takes its module's default isolation, so UI tests need no annotation.
+- **Dispatch.** The reference ADR lets an adapter hide a serial queue behind its port. Here adapters use an actor or `Mutex`, not Dispatch queues.
 
 ## Consequences
 
