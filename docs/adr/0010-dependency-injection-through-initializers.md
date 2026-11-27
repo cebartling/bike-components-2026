@@ -62,7 +62,7 @@ We will inject every dependency through initializers, with the app target as the
 
 - **The current date is a `() -> Date` closure.** A model that needs the current date takes `now: () -> Date` and calls it each time an intent needs the date, so time moves on in a long-lived model. Computed properties don't call it: Observation doesn't track the clock, so a value derived from the date is computed by an intent and kept in state. It passes the result to Core as a `Date` (ADR-0003). The composition root passes `{ Date.now }`. Tests and previews pass a fixed date.
 - **A calendar is a `Calendar` value.** A model that needs a calendar or a time zone takes a `Calendar` and uses its `timeZone`, and passes them to Core as parameters. The composition root passes `Calendar.autoupdatingCurrent`, which follows the user's settings when they change. Tests pass a fixed calendar with a fixed time zone, so they don't depend on the device.
-- **Models never read them themselves.** No `Date.now`, `Date()`, `Calendar.current`, `TimeZone.current` or `Locale.current` in Core or in `Sources/BikeComponentsUI/Presentation/`. Views format through the environment's values (ADR-0008).
+- **Models never read them themselves.** No `Date.now`, `Date()`, or `.current` or `.autoupdatingCurrent` of `Calendar`, `TimeZone` or `Locale` in Core or in `Sources/BikeComponentsUI/Presentation/`. Views format through the environment's values (ADR-0008).
 
 ### Fakes
 
