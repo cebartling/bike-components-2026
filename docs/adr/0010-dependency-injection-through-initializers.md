@@ -60,7 +60,7 @@ We will inject every dependency through initializers, with the app target as the
 
 ### Clock, calendar and time zone
 
-- **The current date is a `() -> Date` closure.** A model that needs the current date takes `now: () -> Date` and calls it each time an intent needs the date, so time moves on in a long-lived model. It passes the result to Core as a `Date` (ADR-0003). The composition root passes `{ Date.now }`. Tests and previews pass a fixed date.
+- **The current date is a `() -> Date` closure.** A model that needs the current date takes `now: () -> Date` and calls it each time an intent needs the date, so time moves on in a long-lived model. Computed properties don't call it: Observation doesn't track the clock, so a value derived from the date is computed by an intent and kept in state. It passes the result to Core as a `Date` (ADR-0003). The composition root passes `{ Date.now }`. Tests and previews pass a fixed date.
 - **A calendar is a `Calendar` value.** A model that needs a calendar or a time zone takes a `Calendar` and uses its `timeZone`, and passes them to Core as parameters. The composition root passes `Calendar.autoupdatingCurrent`, which follows the user's settings when they change. Tests pass a fixed calendar with a fixed time zone, so they don't depend on the device.
 - **Models never read them themselves.** No `Date.now`, `Date()`, `Calendar.current`, `TimeZone.current` or `Locale.current` in Core or in `Sources/BikeComponentsUI/Presentation/`. Views format through the environment's values (ADR-0008).
 
@@ -99,7 +99,7 @@ Child models:
 Current date:
 
 - **A `() -> Date` closure (chosen).** One function is the whole dependency, and a fixed date in tests is one closure.
-- **The view passes the date into each intent.** Rejected: the view would read the clock, and a model's computed properties couldn't use the date.
+- **The view passes the date into each intent.** Rejected: the view would read the clock, where no unit test reaches it (ADR-0008 gives views none).
 - **A clock protocol.** ADR-0003 rules out a clock port for Core. In a model it would be a type and a fake doing what a closure does.
 - **Swift's `Clock` protocol.** It measures durations for sleeps and deadlines, not the calendar date a service interval needs.
 
