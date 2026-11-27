@@ -16,7 +16,7 @@ Forces at play:
 - **The SwiftData convenience is already gone.** ADR-0003 keeps `@Model` objects out of the UI, so views can't use `@Query`, and the adapter maps either way.
 - **The dependency policy** (ADR-0006) admits a package only when the SDK can't do the job.
 - **SwiftData behaviour, checked with Xcode 27.2 and Swift 6.4.2.** A scratch package with our Swift settings (Swift 6 mode, the three upcoming features of ADR-0005, a nonisolated module) builds for the iOS Simulator with `@Model` classes, a `@ModelActor` and an actor holding a `ModelContext`, with no warnings and no concurrency escapes. `ModelContainer`, `ModelConfiguration` and `PersistentIdentifier` are `Sendable`. No iOS Simulator runtime was installed, so the runtime checks ran on macOS 27.2 with the same SwiftData:
-  - A `@ModelActor`'s methods ran on the main thread whenever the calling task was on the main actor, five out of five calls, even when the actor and its container were created off the main actor and the call went through a `@concurrent` function. Called from a nonisolated task, they ran off the main thread. A plain actor that creates its own `ModelContext(container)` in its initializer ran off the main thread from both, and 200 concurrent insert-and-save calls into it passed under Thread Sanitizer with no reports.
+  - A `@ModelActor`'s executor ran each job synchronously on the thread that hopped to it, on its context's queue. Called from the main actor, its methods ran on the main thread, five out of five calls, wherever the actor and its container were created. Called from a nonisolated task, they ran off the main thread. A `@concurrent` function between the two didn't reliably help: one that only forwards the call skipped the hop off the main actor and ran on the main thread, and one that did work before the call ran off the main thread in a debug build but on it in a release build. A plain actor that creates its own `ModelContext(container)` in its initializer ran off the main thread from both, and 200 concurrent insert-and-save calls into it passed under Thread Sanitizer with no reports.
   - Inserting a second object with the same `@Attribute(.unique)` value didn't fail: after both saves there was one object, holding the second object's values.
   - A `ModelConfiguration`'s `cloudKitDatabase` defaults to `.automatic`. Apple's documentation says it then mirrors to CloudKit when the app has the iCloud entitlement.
   - A `ModelContext` created by a `@ModelActor` has `autosaveEnabled` set to `false`.
@@ -71,7 +71,7 @@ We will store the app's data in one app-wide SwiftData store, behind Core's repo
 Store isolation:
 
 - **A plain actor owning a `ModelContext` (chosen).** Measured off the main thread from any caller, and race-free under Thread Sanitizer. It isn't the pattern Apple's documentation shows, so it has to be checked on iOS (see Consequences).
-- **A `@ModelActor`.** Apple's pattern, and less code. Rejected: it ran on the main thread when called from the main actor, even through `@concurrent`.
+- **A `@ModelActor`.** Apple's pattern, and less code. Rejected: it ran on the main thread when called from the main actor, and a `@concurrent` function in between didn't reliably move it.
 - **A separate context per call.** No shared state, but each call pays for a new context, and two concurrent writes could interleave their fetch-then-insert upserts and create duplicates.
 
 ### Where this diverges from the reference project
