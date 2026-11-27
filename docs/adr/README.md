@@ -14,6 +14,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | [0006](0006-third-party-dependency-policy.md) | Third-party dependency policy | Accepted | 2026-11-27 |
 | [0007](0007-persistence-with-swiftdata.md) | Persistence with SwiftData | Accepted | 2026-11-27 |
 | [0008](0008-state-management-with-observable-presentation-models.md) | State management with `@Observable` presentation models | Accepted | 2026-11-27 |
+| [0009](0009-sync-and-backup-with-cloudkit.md) | Sync and backup with CloudKit | Accepted | 2026-11-27 |
 
 ## Adding an ADR
 
