@@ -62,7 +62,7 @@ We will use Apple's frameworks first, and add a third-party package only by exce
 ### Tools
 
 - **Admitted by the ADR that introduces them**, for example CI (#2) for `just`, SwiftFormat or SwiftLint, and approved the same way. That ADR names the tool, its license and how it is installed. Tools aren't shipped, so any OSI-approved open-source license will do, but they must be maintained.
-- **Standalone binaries.** Tools are installed as programs: with Homebrew on a development machine, as `README.md` describes, and in CI as pinned below. They are not SwiftPM build-tool plugins or package dependencies, so the package graph holds only code that the app and its tests build.
+- **Standalone binaries.** Tools are installed as programs: with Homebrew on a development machine, as `README.md` describes, and in CI as pinned below. They are not SwiftPM build-tool plugins or package dependencies, so the package graph holds only code that the app and its tests build. A formatter, linter or other tool is never brought in as a plugin package. The package rules for macros and build plugins cover only packages whose code the app or its tests compile against.
 - **Pinned where they gate CI.** A tool whose version can change whether CI passes, such as a formatter or linter, is pinned in CI by version and SHA-256 checksum. A tool that only runs commands, such as `just`, may be installed unpinned. CI prints every tool's version. When a tool is upgraded locally, its CI pin moves in the same change.
 - **GitHub Actions.** Actions from GitHub's own `actions` organization are pinned to a major version tag. Any other action is pinned to a full commit SHA, with its version in a comment, and is used only when a few lines of shell can't do the job.
 
