@@ -10,6 +10,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | [0002](0002-target-platforms-and-minimum-os-versions.md) | Target platforms and minimum OS versions | Accepted | 2026-11-26 |
 | [0003](0003-hexagonal-architecture.md) | Hexagonal architecture (ports and adapters) | Accepted | 2026-11-26 |
 | [0004](0004-project-structure-and-module-boundaries.md) | Project structure and module boundaries | Accepted | 2026-11-26 |
+| [0005](0005-concurrency-model.md) | Concurrency model | Accepted | 2026-11-26 |
 
 ## Adding an ADR
 
