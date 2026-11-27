@@ -53,7 +53,7 @@ We will sync the whole store across the user's devices with SwiftData's CloudKit
 
 ### Conflicts
 
-- **The framework resolves conflicts.** We accept its last-writer-wins behaviour and add no conflict handling of our own. One person edits the data, and editing the same component on two devices within the sync delay is rare. The data that changes most, rides, comes from Strava and is reconciled as above.
+- **The framework resolves conflicts.** We accept whatever it does, reported to be last writer wins, and add no conflict handling of our own. One person edits the data, and editing the same component on two devices within the sync delay is rare. The data that changes most, rides, comes from Strava and is reconciled as above.
 - **Deletes propagate.** Deleting on one device deletes on every device. Deleting stays permanent, as in the reference project. A record deleted on one device while it is edited on another follows the framework's behaviour. A component whose bike was deleted as a duplicate loser is left on no bike (ADR-0003 allows that) rather than lost.
 
 ### Schema evolution
