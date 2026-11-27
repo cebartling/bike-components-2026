@@ -12,6 +12,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | [0004](0004-project-structure-and-module-boundaries.md) | Project structure and module boundaries | Accepted | 2026-11-26 |
 | [0005](0005-concurrency-model.md) | Concurrency model | Accepted | 2026-11-26 |
 | [0006](0006-third-party-dependency-policy.md) | Third-party dependency policy | Accepted | 2026-11-27 |
+| [0007](0007-persistence-with-swiftdata.md) | Persistence with SwiftData | Accepted | 2026-11-27 |
 
 ## Adding an ADR
 

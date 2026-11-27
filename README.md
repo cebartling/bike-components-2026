@@ -4,7 +4,7 @@ A bike components inventory app built in Swift and SwiftUI.
 
 ## Status
 
-Early setup. There is no app code yet. The basic architecture (persistence, testing and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
+Early setup. There is no app code yet. The basic architecture (testing, state management and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
 
 ## Requirements
 
