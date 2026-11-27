@@ -81,13 +81,13 @@ Store isolation:
 - **Store.** The reference project uses GRDB. Here SwiftData wins because the SDK can do the job (ADR-0006) and because this app runs on two kinds of device, where CloudKit sync matters. The reference project is one Mac with no sync. Its objection that SwiftData pulls persistence into the domain doesn't apply here: ADR-0003 maps at the adapter, as it does with GRDB.
 - **Uniqueness.** The reference project can rely on SQLite constraints. Here the store has none, to keep CloudKit open. Core enforces uniqueness, and the adapter checks gear IDs with a fetch when it saves a bike.
 - **Kept:** one app-wide store, the store's types only in the persistence adapter, and failing fast without recreating the store.
-- **ADR-0005's example.** ADR-0005 named SwiftData's `ModelActor` as an example of the adapter's isolation. This ADR uses a plain actor instead, for the reason above.
 
 ## Consequences
 
 - **Easier:** no package to pin or check at each toolchain move; a direct path to CloudKit sync for #13; in-memory adapter tests that touch no disk.
 - **Harder:** every schema attribute needs a default or an optional, and the mapping must reject records that don't make valid Core values. Upserts are fetch-then-write code in the adapter instead of a store constraint. SwiftData migrations hide the SQL, so their tests carry more weight. SwiftData changes with each OS release, and the toolchain moves with each one (ADR-0002).
 - **Verify on iOS.** The thread checks ran on macOS. The persistence adapter's first tests run on the iOS Simulator and include one that a port method called from the main actor runs off the main thread. The adapter's tests run with Core Data's concurrency assertions on (`com.apple.CoreData.ConcurrencyDebug` set to 1), so a misused context fails them. How the setting reaches the package's generated test scheme is worked out with #16. If either check fails, this ADR's threading decision is revisited before more adapter code is written.
+- **ADR-0005.** It named SwiftData's `ModelActor` as an example of the adapter's isolation. This ADR uses a plain actor instead, for the reason under Threading. ADR-0005's rules are unchanged.
 - **Sync and backup (#13)** chooses between CloudKit mirroring, device backup only, or something else. With CloudKit, duplicates can also arrive through merges from another device, so #13 decides how they are reconciled. CloudKit schemas can only grow once deployed, which constrains later migrations.
 - **Testing (#16)** decides the framework. This ADR settles that adapter tests use in-memory stores, one container per test, and that migration tests use temporary files.
 - **Error model (#18)** decides how port methods report store errors. This ADR requires only that they are descriptive and never swallowed.
