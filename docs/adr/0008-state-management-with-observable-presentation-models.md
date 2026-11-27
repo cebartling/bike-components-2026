@@ -14,7 +14,7 @@ Forces at play:
 - **Testability.** The project is test-driven. Logic inside a view's `body` or its action closures can only be tested by rendering the view or through UI tests.
 - **Observation is available everywhere.** ADR-0002's minimum (iOS 27.2) is far above Observation's iOS 17, so `@Observable`, `@Bindable` and `@Environment` with observable types need no `#available` checks. Observation isn't part of SwiftUI, so a file can use `@Observable` without importing SwiftUI.
 - **Core can't be observable.** Core imports Foundation only (ADR-0003), so domain types can't be `@Observable`. Anything a view observes lives outside Core.
-- **Imports are per file.** Checked with Xcode 27.2, building for the iOS Simulator: in a main-actor package target with ADR-0005's settings, a file that imports only Foundation, Observation and Core fails with "cannot find 'Color' in scope" when it uses `Color`, even though another file in the same target imports SwiftUI. `MemberImportVisibility` (ADR-0005) extends that to members that SwiftUI adds to other modules' types. A module boundary adds nothing here: SwiftPM doesn't stop a target importing a system framework either.
+- **Imports are per file.** Checked with Xcode 27.2, building for the iOS Simulator: in a main-actor package target with ADR-0005's settings, a file that imports only Foundation, Observation and Core fails with "cannot find 'Color' in scope" when it names `Color`, even though another file in the same target imports SwiftUI. `MemberImportVisibility` (ADR-0005) extends that to members that SwiftUI adds to other modules' types. The rule covers names, not types: such a file still compiles when it reaches a SwiftUI type through another declaration in the module, such as a typealias or a property whose type is inferred, and it can name the module's views. A separate module would stop that, but it wouldn't stop a system framework import: SwiftPM doesn't stop a target importing one.
 - **Long-lived state.** Some state outlives any one screen: whether the app is connected to Strava, and an import in progress, which can be a long first backfill (#3). The import must keep running when the user leaves the screen that started it, and stay cancellable (ADR-0005).
 - **iPad.** A list and a detail can be on screen together, so a change made in one can make the other stale.
 - **Size.** One developer and a small app. A framework or an extra layer is paid for again in every feature.
@@ -38,7 +38,7 @@ We will drive screens with `@Observable` presentation models in `BikeComponentsU
 
 - **An `@Observable` final class,** named for its screen and ending in `Model` (for example `BikeListModel`). It is main-actor isolated through `BikeComponentsUI`'s default isolation (ADR-0005), is never marked `nonisolated`, and isn't `Sendable`. What it passes to Core are Core's own `Sendable` types.
 - **Not `ObservableObject`.** No `@Published`, `@StateObject`, `@ObservedObject` or `@EnvironmentObject`, which depend on Combine (ADR-0005).
-- **In its own file, named after it (`BikeListModel.swift`), which imports Foundation, Observation and `BikeComponentsCore` only.** Never SwiftUI or UIKit. A model and its view are separate files in `BikeComponentsUI`, so the compiler stops a model using SwiftUI's types while views in the same module use them freely. Code review checks the imports until the automated import check that ADR-0003 leaves as a follow-up covers this rule too.
+- **In its own file, named after it (`BikeListModel.swift`), which imports Foundation, Observation and `BikeComponentsCore` only.** Never SwiftUI or UIKit. A model and its view are separate files in `BikeComponentsUI`, so the compiler stops a model naming SwiftUI's declarations while views in the same module use them freely. It doesn't stop a model reaching a SwiftUI type through another declaration in the module, or naming a view, so code review checks that models don't use view-side declarations. Code review also checks the imports until the automated import check that ADR-0003 leaves as a follow-up covers this rule too.
 - **Its initializer does no work.** It stores what it is given and sets initial state. It calls no port and starts no task. Loading happens in an `async` method, such as `load()`, that the view calls from `.task`. SwiftUI may run a view's initializer many times, and tests then control when loading happens.
 
 ### Tasks
@@ -70,8 +70,8 @@ Approach:
 
 Where models live:
 
-- **In `BikeComponentsUI`, in files that don't import SwiftUI (chosen).** The compiler enforces the per-file rule, as checked above, and there is no extra module.
-- **A `BikeComponentsPresentation` module of their own,** as in the reference project. Rejected: a module boundary doesn't stop a system framework import (the reference project needed a lint rule for that), so it adds a module, a test target and `package` access between views and models without enforcing more than the per-file rule does.
+- **In `BikeComponentsUI`, in files that don't import SwiftUI (chosen).** The compiler stops model files naming SwiftUI's declarations, as checked above, and there is no extra module. Code review catches a model reaching view-side declarations.
+- **A `BikeComponentsPresentation` module of their own,** as in the reference project. A module boundary would also stop models reaching views and view-side declarations, but not a system framework import (the reference project needed a lint rule for that). Rejected: that extra protection is small next to the cost of a module, a test target and `package` access between views and models.
 
 Keeping screens consistent:
 
@@ -95,7 +95,7 @@ How models reach views:
 ## Consequences
 
 - **Easier:** testing screen behavior with fast tests and the same fakes as Core; keeping views small and readable; adding a feature, which always takes the same shape: a Core use case if there is a rule, a model, a view.
-- **Harder:** every screen with state needs a model, and the code that builds it. Models hold copies of domain data, so keeping two visible screens consistent is explicit work for their owner, and a forgotten refresh shows stale data. The rule that model files don't import SwiftUI is checked only by code review until an automated check exists.
+- **Harder:** every screen with state needs a model, and the code that builds it. Models hold copies of domain data, so keeping two visible screens consistent is explicit work for their owner, and a forgotten refresh shows stale data. The rule that model files don't import SwiftUI is checked only by code review until an automated check exists, and only code review stops a model using a view-side declaration.
 - **Dependency injection (#15)** decides how the owner of a model gets the ports and use cases to build it (for example the reference project's factory closures), how the current date reaches models, and the fakes used in previews.
 - **Testing (#16)** decides the framework for model tests, where the shared fakes of Core's ports live, and whether there are UI tests.
 - **Navigation (#17)** decides selection and navigation state, state restoration, and whether iPad runs several scenes, and with it which models are per scene and which are app-wide.
