@@ -56,7 +56,7 @@ We will use Apple's frameworks first, and add a third-party package only by exce
   No version ranges, branches or revisions.
 - **Resolved files are committed.** `BikeComponentsKit/Package.resolved` pins the whole graph, including transitive dependencies, for builds of the package scheme. Xcode keeps a second copy for the app project, expected at `BikeComponents.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` (not yet checked, since there is no project yet). Both are committed, and a change that moves a pin updates both.
 - **CI uses only the resolved files.** CI builds with `-onlyUsePackageVersionsFromResolvedFile`, so a `Package.swift` change without its resolved file fails instead of resolving silently.
-- **Updates are manual.** When the toolchain moves to a new Xcode (ADR-0002), each package is checked for a new release. A security fix is taken as soon as it is known. To learn of one, GitHub's Dependabot alerts (security alerts only, not version-update pull requests) are turned on for the repository when the first package arrives. Each update is one pull request per package, which reads the release notes and repeats the dependency check in its description. The admitting ADR keeps the check for the version it first admitted, and isn't edited. An update that still clears the bar needs no new ADR. One that doesn't, for example a new license, a binary target or a new transitive dependency that fails the bar, needs a new ADR or stays on the old version.
+- **Updates are manual.** When the toolchain moves to a new Xcode (ADR-0002), each package is checked for a new release. A security fix is taken as soon as it is known. To learn of one, GitHub's Dependabot alerts (security alerts only, not version-update pull requests) are turned on for the repository when the first package arrives. Each update is one pull request per package, which reads the release notes and repeats the dependency check in its description. The admitting ADR keeps the check for the version it first admitted, and isn't edited. A resolved-file change that moves a transitive dependency is checked against the bar too. An update that still clears the bar needs no new ADR. One that doesn't, for example a new license, a binary target or a new transitive dependency that fails the bar, needs a new ADR or stays on the old version.
 - **A package that blocks the toolchain.** If no version of a package builds with the Xcode that ADR-0002 moves to, or an admitted package no longer clears the bar and no update fixes it, the toolchain move waits for the user to decide. A new ADR then replaces the package, removes it, or accepts the exception.
 
 ### Tools
@@ -81,7 +81,7 @@ Where a package is recorded:
 
 Version pinning:
 
-- **`exact:` versions with committed resolved files (chosen).** Every version change is an edit to `Package.swift` that shows up in review.
+- **`exact:` versions with committed resolved files (chosen).** Every direct version change is an edit to `Package.swift` that shows up in review. Transitive versions change only through a `Package.resolved` diff, which review reads too.
 - **`from:` (up to the next major version) with committed resolved files.** The resolved file still pins the version, but any new resolution, for example after adding another package or using Xcode's "Update to Latest Package Versions", can move a package in a change that never mentions it.
 - **Branch or revision pins.** No version semantics, and updates are hard to review.
 
