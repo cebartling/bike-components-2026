@@ -33,7 +33,7 @@ We will inject every dependency through initializers, with the app target as the
 
 - **Initializers, everywhere.** A type takes the collaborators it uses through its initializer, and a function takes per-call values as parameters. That holds for Core (ADR-0003), the adapters, presentation models and views. There is no property injection, no container, no DI library and no dependency in the environment.
 - **Ports are what is injected.** A model takes the Core ports it uses, as `any BikeRepository` and so on, and builds the Core use cases it calls from them. Use cases are `Sendable` structs that hold their ports (ADR-0005), so building one costs nothing, and the composition root deals only in ports. A model's initializer therefore names every port its intents reach, directly or through a use case.
-- **No default arguments for dependencies.** A port, a factory closure, the clock or a calendar is never a defaulted parameter, so every caller, a test included, says what it passes, and a test can't reach the real clock or calendar by leaving an argument out.
+- **No default arguments for dependencies.** A port, a factory closure, the clock, a calendar or a system shared instance an adapter takes is never a defaulted parameter, so every caller, a test included, says what it passes, and a test can't reach the real clock or calendar by leaving an argument out.
 - **Views are given models, or closures that build them, never ports.** A view that is given a model holds it as ADR-0008 says. A view that builds the model it keeps in `@State` is given a factory closure for it. A view never holds a port, an adapter or a use case, so it can't call one (ADR-0008).
 
 ### Child models
@@ -73,7 +73,7 @@ We will inject every dependency through initializers, with the app target as the
 ### Singletons and shared instances
 
 - **No singletons of our own, in any module.** No `static let shared`, no global or `static` that holds a dependency, no service locator and no type that resolves dependencies by type. ADR-0003 already rules them out for Core. ADR-0005's `let` constants of `Sendable` types, such as a file name, are values, not dependencies, and stay allowed.
-- **System shared instances stay at the edges.** `URLSession.shared`, `FileManager.default`, `UserDefaults.standard`, `NotificationCenter.default` and `UIApplication.shared` are used only in the driven adapters (persistence and Strava) and the composition root. Core can't use them (ADR-0003). Models and views don't. A view uses the environment's action where there is one, such as `openURL` instead of `UIApplication.shared.open`. A UIKit wrapper in `BikeComponentsUI` that needs one where SwiftUI has no equivalent (ADR-0002) is given it through its initializer, with the composition root passing the shared instance. An adapter that uses a shared instance its tests need to replace takes it through its initializer, as the reference project's `URLSessionTransport(session:)` does.
+- **System shared instances stay at the edges.** `URLSession.shared`, `FileManager.default`, `UserDefaults.standard`, `NotificationCenter.default` and `UIApplication.shared` are used only in the driven adapters (persistence and Strava) and the composition root. Core can't use them (ADR-0003). Models and views don't. A view uses the environment's action where there is one, such as `openURL` instead of `UIApplication.shared.open`. A UIKit wrapper in `BikeComponentsUI` that needs one where SwiftUI has no equivalent (ADR-0002) is given it through its initializer, with the composition root passing the shared instance. An adapter that uses a shared instance its tests need to replace takes it through its initializer with no default, and the composition root passes the shared instance.
 
 ### Environment
 
@@ -112,7 +112,7 @@ What the `App` holds while the store opens:
 ### Where this diverges from the reference project
 
 - **Store opening.** The reference project opens its database synchronously in `App.init` and keeps an optional model beside an error string. Here `App.init` builds only the launch model, and opening is `async` and part of that model's state.
-- **Defaults.** Some of the reference project's models default their clock to `Date.init`. Here no dependency has a default.
+- **Defaults.** Some of the reference project's models default their clock to `Date.init`, and its `URLSessionTransport(session:)` defaults to `URLSession.shared`. Here no dependency has a default.
 - **Calendar.** The reference project's presentation types default to `.current` time zones and locales. Here a model takes a `Calendar` and never reads the current one.
 - **Environment.** The reference ADR allows the root model in the environment. Here nothing of ours goes there, which matches the reference project's code.
 - **Fakes.** Each of the reference project's test targets writes its own fakes. Here each port has one fake, shared by the test targets that need it.
