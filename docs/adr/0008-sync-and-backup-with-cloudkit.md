@@ -66,6 +66,7 @@ We will sync the whole store across the user's devices with SwiftData's CloudKit
 ### Strava tokens
 
 - **Tokens never sync.** Each device that imports connects to Strava itself and keeps its own tokens in its own Keychain, not marked synchronizable (#3). A device that never connects still sees every bike and ride through CloudKit.
+- **This rests on Strava issuing each authorization its own tokens,** which isn't verified (#3). If Strava keeps one refresh token per app and athlete, a rotation on one device still strands the other: a device whose refresh fails then re-authorizes, or #3 revisits this choice.
 
 ### Options considered
 
@@ -87,6 +88,11 @@ Conflicts:
 
 - **Accept the framework's resolution (chosen).** Nothing to build.
 - **Field-level merging.** Not available through SwiftData. It would mean `CKSyncEngine`, rejected above.
+
+Strava tokens:
+
+- **Per-device Keychain items (chosen).** Each device holds its own authorization, and a disconnect or a failed refresh on one device stays visible there.
+- **Synchronizable Keychain items shared through iCloud Keychain.** One connection for all devices. Rejected: two devices refreshing at once would race to rotate one refresh token, and the old token stops working at once (#3). Keeping one refresh at a time across devices would need coordination that a per-device actor (ADR-0005) can't give.
 
 ### Where this diverges from the reference project
 
