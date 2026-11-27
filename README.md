@@ -14,6 +14,7 @@ Early setup. There is no app code yet. The basic architecture (testing, dependen
 | Swift | 6.4, as shipped with Xcode 27.2, in Swift 6 language mode ([ADR-0005](docs/adr/0005-concurrency-model.md)) |
 | Target platforms | iPhone and iPad ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
 | Minimum OS versions | iOS 27.2, iPadOS 27.2: latest release only, including point releases ([ADR-0002](docs/adr/0002-target-platforms-and-minimum-os-versions.md)) |
+| Apple Developer Program | A development team, for the iCloud (CloudKit) capability and TestFlight ([ADR-0008](docs/adr/0008-sync-and-backup-with-cloudkit.md)) |
 
 ## Build, run and test
 
