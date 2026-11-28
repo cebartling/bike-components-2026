@@ -65,6 +65,7 @@ Where target settings live:
 - **`.xcconfig` for the target, project level left as is (chosen).** Every setting we decide is readable text, and agents can change it.
 - **`.xcconfig` for both levels.** The project's own settings would move to a second file too. Rejected for now: dozens of template defaults to move by hand, with no decision of ours among them.
 - **Per-configuration files from the start.** No target setting differs between Debug and Release yet. Added when one does.
+- **A separate Debug bundle identifier (or iCloud container).** Debug builds from Xcode and TestFlight builds would install side by side, each with its own store and CloudKit environment. With one identifier they replace each other on a device, and the same local store may meet both CloudKit environments (not checked). Deferred: it would be the first difference between Debug and Release, and ADR-0009's two-device checks before the first TestFlight build with sync show whether it's needed.
 - **A project generator (XcodeGen, Tuist).** ADR-0004 rejected generating the project. Each is also a tool under ADR-0006.
 
 Where the files live:
