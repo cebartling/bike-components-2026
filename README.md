@@ -4,7 +4,7 @@ A bike components inventory app built in Swift and SwiftUI.
 
 ## Status
 
-Early setup. There is no app code yet. The basic architecture (testing, navigation and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
+Early setup. There is no app code yet. The remaining architecture (navigation, design system and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Early setup. There is no app code yet. The basic architecture (testing, navigati
 
 ## Build, run and test
 
-TBD. There is no Xcode project or Swift package yet. The app will be a thin Xcode project, `BikeComponents.xcodeproj`, with its modules in the local Swift package `BikeComponentsKit/`. Tests will run on an iOS Simulator with `xcodebuild` ([ADR-0004](docs/adr/0004-project-structure-and-module-boundaries.md)). This section will describe how to build and run the app, how to run the full test suite, and how to run a single test once the skeleton exists and the testing framework is decided.
+TBD. There is no Xcode project or Swift package yet. The app will be a thin Xcode project, `BikeComponents.xcodeproj`, with its modules in the local Swift package `BikeComponentsKit/`. Tests will run on an iOS Simulator with `xcodebuild` ([ADR-0004](docs/adr/0004-project-structure-and-module-boundaries.md)). Tests use Swift Testing ([ADR-0012](docs/adr/0012-testing-strategy.md)). Once the skeleton adds the `justfile`, `just test` will run every test and `just test-only '<identifier>'` one test, suite or target, with identifiers such as ``'BikeComponentsCoreTests/`Service intervals`/`a chain is due after 3000 km`()'``. [`just`](https://github.com/casey/just) is installed with Homebrew (`brew install just`). This section will describe how to build and run the app once the skeleton exists.
 
 ## Documentation
 
