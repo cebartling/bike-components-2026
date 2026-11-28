@@ -16,8 +16,10 @@ SUPPORTS_MACCATALYST = NO
 TARGETED_DEVICE_FAMILY = 1,2
 IPHONEOS_DEPLOYMENT_TARGET = 27.2
 
-// Signing: automatic until #21 decides.
+// Signing: automatic until #21 decides. The team ID isn't secret (ADR-0013); another
+// developer overrides it in Secrets.xcconfig.
 CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM = RDD45JXSRK
 
 // Swift (ADR-0005): Swift 6 mode, main-actor by default, and the three upcoming features.
 // SWIFT_APPROACHABLE_CONCURRENCY is deliberately not set.
