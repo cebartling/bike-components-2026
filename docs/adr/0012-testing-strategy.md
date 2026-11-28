@@ -92,7 +92,7 @@ We will test with Swift Testing in the package's test targets, with shared fakes
 - **Tests are `async` and await the code they test.** An intent, a use case or a port call is awaited directly. A test never sleeps or polls to wait for work to finish.
 - **Time is injected, never waited for.** `now`, `Calendar` (ADR-0010) and `sleep` (ADR-0011) are passed in. A test passes a fixed date and a sleep that records the durations and returns at once, or throws to cancel a wait.
 - **Values over time use `confirmation`.** A test of an `AsyncSequence`, such as ADR-0009's remote-change port, consumes it inside `confirmation(expectedCount:)` and finishes the sequence from the fake, so the test ends without a timeout.
-- **Cancellation is tested by cancelling.** A test starts the work in a task, cancels it at a point the fake controls, such as from inside a fake port call or the recording sleep, and checks the `cancelled` outcome (ADR-0011) and what was saved before it (ADR-0005).
+- **Cancellation is tested by cancelling.** A test starts the work in a task and cancels it at a point the fake controls, then checks the `cancelled` outcome (ADR-0011) and what was saved before it (ADR-0005). Either the fake cancels its calling task on a call the test picks, with `withUnsafeCurrentTask { $0?.cancel() }`, or the recording sleep throws `CancellationError`. ADR-0011 checks `Task.isCancelled` first, so only the first is a really cancelled task, and a test of the import's cancellation between pages uses it. Not checked in the scratch package.
 - **Isolation follows the module** (ADR-0005). Model tests run on the main actor without annotations. A test that checks where a port runs marks itself `@MainActor`, as ADR-0007's thread check does.
 
 ### Persistence in tests
