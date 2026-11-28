@@ -52,7 +52,7 @@ We will test with Swift Testing in the package's test targets, with shared fakes
 
 ### No UI tests
 
-- **There is no XCUITest target.** Views hold no logic (ADR-0008), and the logic behind them is tested in models. A UI test target would be a new target in the Xcode project, would need the app to launch with fake adapters (a launch-argument branch in the composition root, which ADR-0010 keeps free of logic), and would run slower and break more often than the model tests that already cover the same behavior.
+- **There is no XCUITest target.** Views hold no logic (ADR-0008), and the logic behind them is tested in models. A UI test target would be a new target in the Xcode project, would need the app to launch with fake adapters (one more launch-argument exception in the composition root, which ADR-0010 anticipates but otherwise keeps free of logic), and would run slower and break more often than the model tests that already cover the same behavior.
 - **Revisit** when a navigation flow (#17) or an accessibility requirement (#19) needs a check that model tests can't give. That ADR names the target something other than `BikeComponentsUITests` (ADR-0004) and decides how the app launches with fakes.
 
 ### No snapshot tests
