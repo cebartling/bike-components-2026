@@ -14,6 +14,7 @@ Earlier ADRs already settle part of it:
 - **ADR-0009.** Writes from another device arrive through the remote-change port. Reconciliation deletes duplicate bikes and rides, keeping the one with the smallest `UUID`, so a record on screen can disappear.
 - **ADR-0010.** Child models come from factory closures written by the composition root. `AppModels` holds the app-wide models and a factory for the root screen's model, which the view shown in the launch model's ready state builds and owns. How many scenes there are was left to this ADR.
 - **ADR-0012.** No XCUITest target. UI tests were to be revisited with this ADR.
+- **ADR-0013.** App target build settings, including generated `Info.plist` keys, live in `Config/BikeComponents.xcconfig`, edited as text. Other `Info.plist` values go in `BikeComponents/Info.plist`, which Xcode merges with the generated one. Adding that file is a project change.
 
 Forces at play:
 
@@ -31,7 +32,7 @@ We will build the app as one window holding one `NavigationSplitView`, with navi
 
 ### Scenes
 
-- **One `WindowGroup` scene, one window.** The `App`'s body has one `WindowGroup`, and the app doesn't support multiple scenes: "Supports multiple windows" (`UIApplicationSupportsMultipleScenes`) is off in the app target's Info settings. That is a project change, made in Xcode by the user (ADR-0004). iPadOS still shows the one window at any size the user chooses.
+- **One `WindowGroup` scene, one window.** The `App`'s body has one `WindowGroup`, and the app doesn't support multiple scenes: `UIApplicationSupportsMultipleScenes` is `false` in the `UIApplicationSceneManifest` dictionary of `BikeComponents/Info.plist`. Xcode 27.2's build settings have no generated-`Info.plist` key for it (its build specification defines `INFOPLIST_KEY_UIApplicationSceneManifest_Generation` but nothing for multiple scenes), so ADR-0013's `.xcconfig` can't set it. Adding that `Info.plist` file is ADR-0013's project change, made by the user. iPadOS still shows the one window at any size the user chooses.
 - **No other scene types.** No `DocumentGroup`. `Window`, `Settings` and `MenuBarExtra` are macOS scenes, and macOS isn't targeted (ADR-0002). No `ImmersiveSpace` or other platform's scenes.
 - **One root screen model.** With one scene, the view shown in the launch model's ready state builds one root screen model from `AppModels`' factory and keeps it in `@State` (ADR-0010). Navigation state lives there, not in an app-wide model. App-wide models stay as ADR-0008 and ADR-0009 set them.
 
@@ -52,7 +53,7 @@ We will build the app as one window holding one `NavigationSplitView`, with navi
 
 ### URLs
 
-- **The only URL the app handles is the Strava redirect,** when the Strava app handles sign-in (#3). With `ASWebAuthenticationSession`, the callback returns to the session, so no URL reaches the app. #3 chooses the redirect's form and registers it, which is a project change made by the user.
+- **The only URL the app handles is the Strava redirect,** when the Strava app handles sign-in (#3). With `ASWebAuthenticationSession`, the callback returns to the session, so no URL reaches the app. #3 chooses the redirect's form and registers it, in `BikeComponents/Info.plist` for a URL scheme (ADR-0013), or as a capability, which is a project change made by the user, for a universal link.
 - **One `.onOpenURL`, on the launch model's root view.** That view is on screen from the first frame, so a URL arriving on a cold launch has a handler. It hands the URL to the launch model, which keeps the latest one until it is ready and then passes it on; a URL that arrives after a failed launch is dropped. A function in `Presentation/` matches a URL to the app-wide model that handles it (#3 designs that model and what it is handed), and an unknown URL is ignored. Matching, keeping and passing on are tested in the models.
 - **No navigation deep links yet.** No URL selects an entry or pushes a screen. Routes are values holding domain `UUID`s, so adding a link later is a function that parses a URL into a selection and a path.
 
@@ -116,7 +117,7 @@ URLs and restoration:
 - **ADR-0008 and ADR-0010.** Their open points on navigation are settled: the root screen's model owns selection, the detail column's model and its path; presenting models own their sheets; there is one scene, so one root screen model; and nothing is restored. ADR-0010's launch model also keeps an incoming URL until it is ready. Their rules are otherwise unchanged.
 - **ADR-0012.** Its UI-test revisit is answered: still none, revisited with #19.
 - **Strava (#3)** chooses the redirect's form, registers it, and designs the app-wide model that handles it and what that model is handed.
-- **Project changes for the user,** with the skeleton: turn off "Supports multiple windows" in the app target's Info settings, and later register the Strava redirect (#3).
+- **Skeleton.** It sets `UIApplicationSupportsMultipleScenes` to `false` in `BikeComponents/Info.plist`, once the user has added that file (ADR-0013), and checks in the built app's `Info.plist` that the key survives the merge with the generated scene manifest.
 - **Checks with the first screens,** on the simulator on iPhone and on a resized iPad window: that a cold launch from the Strava redirect reaches the launch view's `.onOpenURL`; that a screen covered by a pushed one runs its `.task` again when it reappears, so it reloads after the pushed screen's writes; and that popping back to the sidebar in a compact width leaves the selection consistent with the path. If one fails, adjust the design before building on it, and record the change in a new ADR if it changes a rule here.
 - **Follow-up:** if a pushed screen's write must change the sidebar, the first such case decides how the root screen's model learns of it.
 - **Revisit:** multiple windows, with a change-notification port; restoration, if reopening at the root gets annoying; deep links, when a widget, notification or Spotlight entry needs one.
