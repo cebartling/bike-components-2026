@@ -84,7 +84,7 @@ We will test with Swift Testing in the package's test targets, with shared fakes
 - **Names are sentences.** Suites are structs named for what they test, and tests are sentences, both with raw identifiers: ``struct `Service intervals` `` and ``@Test func `a chain is due after 3000 km`()``. A test file is named for the type or feature it tests, `<Subject>Tests.swift`.
 - **Tables are parameterized.** Rules checked against several inputs use `@Test(arguments:)` instead of a loop or copied tests.
 - **`#require` for preconditions,** such as unwrapping an optional, so the test stops there. `#expect` for everything else.
-- **Each test builds its own state.** A suite's stored properties are set in its `init`, which Swift Testing runs for every test, or the test builds what it needs in its body. Nothing is shared between tests through `static`s or globals (ADR-0005), so tests run in parallel, Swift Testing's default. `.serialized` only with a comment saying why.
+- **Each test builds its own state.** A suite's stored properties are set in its `init`, which Swift Testing runs for every test, or the test builds what it needs in its body. No mutable state is shared between tests: `static`s and globals are `Sendable` `let` constants only, such as a fixed date or a sample bike (ADR-0005), so tests run in parallel, Swift Testing's default. `.serialized` only with a comment saying why.
 - **`@testable import` only where a test needs `internal` declarations,** such as the persistence adapter's schema versions and `@Model` types. Tests otherwise use the module's `package` API.
 
 ### Async code
