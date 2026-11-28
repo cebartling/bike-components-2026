@@ -34,7 +34,7 @@ We will use `URLSession` behind a transport seam inside the Strava adapter, and 
 ### HTTP layer
 
 - **No networking package.** The Strava adapter uses `URLSession`'s `async` API.
-- **One transport seam, inside the adapter.** `BikeComponentsStrava` declares `HTTPTransport`, a `Sendable` protocol with one method, `send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse)`, used for every method (OAuth needs `POST`). `URLSessionTransport` implements it and takes its `URLSession` through its initializer, with no default (ADR-0010). Both are `public`, because the composition root builds the transport and passes it to the adapter's initializer (ADR-0010). The transport throws whatever `URLSession` throws. Mapping happens above it.
+- **One transport seam, inside the adapter.** `BikeComponentsStrava` declares `HTTPTransport`, a `Sendable` protocol with one method, `send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse)`, used for every method (OAuth needs `POST`). `URLSessionTransport` implements it and takes its `URLSession` through its initializer, with no default (ADR-0010). Both are `public`, because the composition root builds the transport and passes it to the adapter's initializer (ADR-0010). The transport throws whatever `URLSession` throws, and `URLError(.badServerResponse)` for a response that isn't an `HTTPURLResponse`, as in the reference project. Mapping happens above it.
 - **An ephemeral session.** The composition root builds one `URLSession` with `URLSessionConfiguration.ephemeral`, so the URL loading system writes no responses, cookies or credentials to disk. Strava responses hold personal data, and requests carry tokens. Its `timeoutIntervalForRequest` is 30 seconds instead of the default 60, because timeouts are retried: with two retries, one call reports `unavailable` after about a minute and a half, not three.
 - **One request layer does the rest.** An internal client in the adapter builds each request from the API's base URL, adds `Authorization: Bearer` with a token from the token actor (ADR-0005), sends it through the transport, reads the rate-limit headers, maps the status, decodes the body and applies the retry rules below. The adapter's port implementations call the client and never build a `URLRequest` or touch the transport.
 - **Work runs off the caller's actor.** The client's request function is `@concurrent`, so encoding, decoding and mapping never run on the main actor when a main-actor model calls a port (ADR-0005). The transport and client are stateless `Sendable` structs. The only mutable state is the tokens, in the token actor.
@@ -58,6 +58,7 @@ We will use `URLSession` behind a transport seam inside the Strava adapter, and 
   | The token endpoint answers a refresh with a `4xx` other than `429` (the exact statuses are checked in #3) | `authorizationRejected` |
   | `401`, after the refresh and retry | `authorizationRejected` |
   | `429` | `rateLimited(resetsAt:)` |
+  | `URLError(.cancelled)` while the task isn't cancelled (for example an invalidated session), never retried | `unavailable(detail:)` |
   | Any other `URLError`, `5xx` after its retries, or any other status | `unavailable(detail:)` |
   | A body that doesn't decode, or a value Core rejects when it is mapped | `unreadableResponse(detail:)` |
 
