@@ -53,11 +53,15 @@ We will use `URLSession` behind a transport seam inside the Strava adapter, and 
   | What happened | Case |
   | --- | --- |
   | The task is cancelled (`Task.isCancelled`), whatever was thrown | `cancelled` |
+  | No tokens stored on this device | `notConnected` |
   | `URLError` `.notConnectedToInternet`, `.dataNotAllowed`, `.internationalRoamingOff` | `offline` |
+  | The token endpoint answers a refresh with a `4xx` other than `429` (the exact statuses are checked in #3) | `authorizationRejected` |
   | `401`, after the refresh and retry | `authorizationRejected` |
   | `429` | `rateLimited(resetsAt:)` |
   | Any other `URLError`, `5xx` after its retries, or any other status | `unavailable(detail:)` |
   | A body that doesn't decode, or a value Core rejects when it is mapped | `unreadableResponse(detail:)` |
+
+  The token actor produces `notConnected` and a rejected refresh's `authorizationRejected`, and the client passes them on unchanged. A refresh's own transport failures, and a `429` from the token endpoint, map through the other rows.
 
 - **Details are for debugging, and never hold secrets.** A `detail` says what failed and where, built from parts the adapter chooses: the request's method and path (never its query string), the HTTP status, a `URLError`'s code by name and number (such as `timedOut (-1001)`), a store error's type and its `localizedDescription`, or the type and coding path that didn't decode. It never uses `String(describing:)` of an `NSError` or a `URLError`, which prints the full failing URL with its query. It never holds request or response headers, bodies, tokens, the client secret or an authorization code.
 - **No secrets in URLs.** Tokens, the client secret and authorization codes are never put in a request URL. API requests carry the token in the `Authorization` header, and the OAuth exchange sends its secrets in the body.
