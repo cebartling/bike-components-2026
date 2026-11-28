@@ -20,6 +20,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | [0012](0012-testing-strategy.md) | Testing strategy | Accepted | 2026-11-27 |
 | [0013](0013-build-configuration-and-secrets.md) | Build configuration and secrets | Accepted | 2026-11-27 |
 | [0014](0014-navigation-and-scene-structure.md) | Navigation and scene structure | Accepted | 2026-11-27 |
+| [0015](0015-project-file-changes-with-xcodeproj.md) | Project file changes with Apple's `xcodeproj` tool | Accepted | 2026-11-27 |
 
 ## Adding an ADR
 

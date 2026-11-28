@@ -4,7 +4,7 @@ A bike components inventory app built in Swift and SwiftUI.
 
 ## Status
 
-Early setup. There is no app code yet. The remaining architecture (design system, logging and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
+Early setup. The project skeleton builds, launches and tests, with no features yet. The remaining architecture (design system, logging and more) is being decided and recorded as [Architecture Decision Records](docs/adr/README.md) before the first feature is built.
 
 ## Requirements
 
@@ -18,7 +18,13 @@ Early setup. There is no app code yet. The remaining architecture (design system
 
 ## Build, run and test
 
-TBD. There is no Xcode project or Swift package yet. The app will be a thin Xcode project, `BikeComponents.xcodeproj`, with its modules in the local Swift package `BikeComponentsKit/`. Tests will run on an iOS Simulator with `xcodebuild` ([ADR-0004](docs/adr/0004-project-structure-and-module-boundaries.md)). Tests use Swift Testing ([ADR-0012](docs/adr/0012-testing-strategy.md)). Once the skeleton adds the `justfile`, `just test` will run every test and `just test-only '<identifier>'` one test, suite or target, with identifiers such as ``'BikeComponentsCoreTests/`Service intervals`/`a chain is due after 3000 km`()'``. [`just`](https://github.com/casey/just) is installed with Homebrew (`brew install just`). The app target's build settings will live in `Config/BikeComponents.xcconfig`. Per-developer values such as the Strava client ID will go in a local, git-ignored `Config/Secrets.xcconfig` ([ADR-0013](docs/adr/0013-build-configuration-and-secrets.md)); the Strava integration will document its keys. This section will describe how to build and run the app once the skeleton exists.
+The app is a thin Xcode project, `BikeComponents.xcodeproj`, with its modules in the local Swift package `BikeComponentsKit/` ([ADR-0004](docs/adr/0004-project-structure-and-module-boundaries.md)). Commands run through [`just`](https://github.com/casey/just), installed with Homebrew (`brew install just`):
+
+- `just build` builds the app for the iPhone 18 Pro simulator (iOS 27.2).
+- `just test` runs every test in `BikeComponentsKit` on that simulator, with Swift Testing ([ADR-0012](docs/adr/0012-testing-strategy.md)).
+- `just test-only '<identifier>'` runs one test, suite or target, for example ``just test-only 'BikeComponentsCoreTests/`Source errors`'``. It fails when the identifier matches nothing.
+
+To run the app, open `BikeComponents.xcodeproj` in Xcode, or install the built app with `xcrun simctl`. The app target's build settings live in `Config/BikeComponents.xcconfig` ([ADR-0013](docs/adr/0013-build-configuration-and-secrets.md)), and project changes are made with Apple's `xcodeproj` tool ([ADR-0015](docs/adr/0015-project-file-changes-with-xcodeproj.md)). Per-developer values such as the Strava client ID will go in a local, git-ignored `Config/Secrets.xcconfig`, and the Strava integration will document its keys.
 
 ## Documentation
 
