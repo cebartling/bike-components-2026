@@ -117,7 +117,7 @@ We will test with Swift Testing in the package's test targets, with shared fakes
 
 - **`just` is admitted** under ADR-0006's rules for tools, ahead of CI (#2), because the test command needs a wrapper before CI exists.
   - **Tool:** [`just`](https://github.com/casey/just), a command runner. It only runs the recipes' commands, so it doesn't gate CI the way a formatter does, and ADR-0006 lets it be unpinned.
-  - **License:** CC0-1.0. ADR-0006 accepts any OSI-approved license for tools, and the OSI hasn't approved CC0, so this is an exception, argued here: CC0 dedicates the work to the public domain, which places fewer conditions on us than any OSI-approved license, and the tool is never shipped or linked, so no license notice goes with the app.
+  - **License:** CC0-1.0. ADR-0006 accepts any OSI-approved license for tools, and the OSI hasn't approved CC0, so this is an exception, argued here: CC0 dedicates the work to the public domain and places no conditions on its use. The OSI didn't approve it because it expressly withholds patent rights, which doesn't matter for a tool we only run. It is never shipped or linked, so no license notice goes with the app.
   - **Maintained:** release 1.59.0 on 2026-10-15, and commits on 2026-11-15.
   - **Installed** with Homebrew on a development machine (`brew install just`), as `README.md` says. CI installs it unpinned and prints its version (ADR-0006).
 - **The rest ships with Xcode and macOS.** `xcodebuild`, `xcrun xcresulttool` and `/usr/libexec/PlistBuddy` are not third-party tools.
