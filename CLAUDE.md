@@ -123,7 +123,7 @@ The repository holds `README.md`, `LICENSE` (MIT), an Xcode/Swift `.gitignore` a
   - In an `.xcconfig`, `//` starts a comment: write URLs as `https:/$()/host`.
   - Per-developer or unpublishable values go in `Config/Secrets.xcconfig`, git-ignored (add it to `.gitignore` before the file exists; the repo is public). `Config/BikeComponents.xcconfig` declares each such setting empty and ends with `#include? "Secrets.xcconfig"` as its last line. A missing file builds silently with empty values.
   - Values reach code through `BikeComponents/Info.plist` keys set to the build setting (`$(STRAVA_CLIENT_ID)`), merged with the generated plist (adding the file is a project change: ask the user). Only the composition root reads them, with `Bundle.main.object(forInfoDictionaryKey:)`, passing the string (empty if missing) to the adapter's initializer. The adapter's public initializer or configuration type throws a typed error naming the empty field (not the key, which it doesn't know; the launch wording or README maps the field to its setting), so the launch fails with it. #3 names the Strava settings and decides whether the client secret is embedded; anything in `Info.plist` is readable from the `.ipa`.
-  - CI builds and tests without the secrets file. Secrets are never committed, logged or put in URLs (ADR-0011).
+  - CI builds and tests without the secrets file. Secrets are never committed, logged or put in URLs (ADR-0011). `-showBuildSettings` and run-script environments expose every build setting: a job holding the secrets file never prints build settings, and no script phase echoes its environment.
 
 ## Open decisions
 
