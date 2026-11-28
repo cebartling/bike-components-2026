@@ -47,12 +47,8 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPort
 INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
 
 // The rest of Xcode's template target settings, unchanged.
-ENABLE_APP_SANDBOX = YES
-ENABLE_USER_SELECTED_FILES = readonly
 ENABLE_PREVIEWS = YES
-REGISTER_APP_GROUPS = YES
 LD_RUNPATH_SEARCH_PATHS = @executable_path/Frameworks
-LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = @executable_path/../Frameworks
 
 // Per-developer values (ADR-0013). Must stay the last line.
 #include? "Secrets.xcconfig"
