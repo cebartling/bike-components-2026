@@ -10,6 +10,12 @@
       "Base",
     ],
   },
+  "packages": [
+    {
+      "kind": "local",
+      "path": "BikeComponentsKit",
+    },
+  ],
   "files": [
     { "kind": "folder", "path": "BikeComponents", "target-membership": [ "BikeComponents" ] },
     {
@@ -30,6 +36,13 @@
         "compile-sources",
         "frameworks",
         "resources",
+      ],
+      "package-product-members": [
+        {
+          "package": "BikeComponentsKit",
+          "product-name": "BikeComponentsKit",
+          "build-phase": { "build-phase": "frameworks" },
+        },
       ],
       "build-settings": {
         "CODE_SIGN_STYLE": "Automatic",
