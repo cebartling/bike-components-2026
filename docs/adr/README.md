@@ -16,6 +16,7 @@ This directory holds the Architecture Decision Records (ADRs) for the project. [
 | [0008](0008-state-management-with-observable-presentation-models.md) | State management with `@Observable` presentation models | Accepted | 2026-11-27 |
 | [0009](0009-sync-and-backup-with-cloudkit.md) | Sync and backup with CloudKit | Accepted | 2026-11-27 |
 | [0010](0010-dependency-injection-through-initializers.md) | Dependency injection through initializers | Accepted | 2026-11-27 |
+| [0011](0011-networking-and-error-model.md) | Networking and error model | Accepted | 2026-11-27 |
 
 ## Adding an ADR
 
