@@ -24,11 +24,11 @@ Forces at play:
 - **The `.pbxproj` is hard to review and only the user edits it.** Every changed setting is a project change, and its diff sits among object IDs.
 - **Xcode's iOS App template (Xcode 27.2)** writes settings at two levels. The project level gets the compiler warnings, and the Debug and Release differences (optimization, debug information, testability). The target level gets the product name, bundle identifier, versions, generated `Info.plist` keys, device family, `IPHONEOS_DEPLOYMENT_TARGET`, asset catalog names, `ENABLE_PREVIEWS`, `SWIFT_VERSION`, `SWIFT_APPROACHABLE_CONCURRENCY` and `SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY`.
 - **Checked with Xcode 27.2** in a scratch iOS app outside the repository. The scratch project was generated with XcodeGen, which ran only for this check. It had a buildable folder holding an `Info.plist`, and its target used an `.xcconfig` file as the base configuration for Debug and Release:
-  - **Precedence.** A setting at the target level of the `.pbxproj` beats the target's `.xcconfig` (`SWIFT_VERSION` 5.0 in the project beat 6 in the file). The target's `.xcconfig` beats the project level (`IPHONEOS_DEPLOYMENT_TARGET` 27.2 in the file beat 26.0 in the project). An `.xcconfig` only takes effect for settings the target level leaves unset.
+  - **Precedence.** A setting at the target level of the `.pbxproj` beats the target's `.xcconfig` (`MARKETING_VERSION` 9.9 at the target level beat 0.1.0 in the file). The target's `.xcconfig` beats the project level (`IPHONEOS_DEPLOYMENT_TARGET` 27.2 in the file beat 26.0 in the project). An `.xcconfig` only takes effect for settings the target level leaves unset.
   - **Optional include.** `#include? "Secrets.xcconfig"` with the file missing builds without a warning, and settings the file would set keep their earlier value, here empty. With the file present, its values win over earlier lines, and a line after the include wins over it.
   - **`//` starts a comment.** `URL_VALUE = https://www.strava.com/oauth` became `https:`.
   - **Into the app.** With `GENERATE_INFOPLIST_FILE = YES` and `INFOPLIST_FILE` pointing at an `Info.plist` holding `<key>StravaClientID</key><string>$(STRAVA_CLIENT_ID)</string>`, the built `Info.plist` merged both and held the substituted value, or an empty string with no secrets file. `plutil -p` read it in plain text.
-  - **Not copied.** An `.xcconfig` file placed inside the buildable folder wasn't copied into the `.app`. Neither was `Info.plist`, which had a membership exception.
+  - **Copied unless excepted.** An `.xcconfig` file inside the buildable folder is copied into the `.app` as a resource. A first run missed this because XcodeGen had quietly added a membership exception for it. With the exception removed, the built `.app` held the file. `Info.plist`, which has an exception, isn't copied.
   - A simulator build with `CODE_SIGNING_ALLOWED=NO` succeeded without the secrets file.
 - **Reference project.** investment-simulator-2026 builds with SwiftPM alone ([ADR-0006](https://github.com/cebartling/investment-simulator-2026/blob/main/docs/adr/0006-swiftpm-only-build-and-hand-assembled-app-bundle.md)), so it has no Xcode build settings. Its `Info.plist` is a committed file, and `just bundle` stamps the version into the bundled copy ([ADR-0018](https://github.com/cebartling/investment-simulator-2026/blob/main/docs/adr/0018-release-and-distribution.md)). Its one secret, a market-data API key, belongs to the user: it is entered in a Settings scene and stored in the Keychain behind a port ([ADR-0012](https://github.com/cebartling/investment-simulator-2026/blob/main/docs/adr/0012-market-data-and-secrets.md)).
 
@@ -70,7 +70,7 @@ Where target settings live:
 Where the files live:
 
 - **`Config/` at the root (chosen).** Build input stays apart from app sources and resources. Nothing in it can become a resource.
-- **Inside `BikeComponents/`.** The check showed an `.xcconfig` there isn't copied into the app, but the folder's members are app sources and resources, and a secrets file next to them is one wrong file type or exception away from shipping.
+- **Inside `BikeComponents/`.** Rejected: the check showed an `.xcconfig` there is copied into the app unless it has a membership exception, so a secrets file there would ship as soon as one exception was missed.
 
 How per-developer values get into the app:
 
