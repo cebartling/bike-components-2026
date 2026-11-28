@@ -34,7 +34,7 @@ STRING_CATALOG_GENERATE_SYMBOLS = YES
 // Info.plist: generated keys here, other keys in BikeComponents/Info.plist (ADR-0013, ADR-0014).
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_FILE = BikeComponents/Info.plist
-// ADR-0014: the scene manifest comes from Info.plist, because a generated one sets
+// ADR-0015 (for ADR-0014's single window): the scene manifest comes from Info.plist, because a generated one sets
 // UIApplicationSupportsMultipleScenes to true over Info.plist's false.
 INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO
 INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*] = YES
