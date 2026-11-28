@@ -81,7 +81,7 @@ We will test with Swift Testing in the package's test targets, with shared fakes
 
 ### Writing tests
 
-- **Names are sentences.** Suites are structs named for what they test, and tests are sentences, both with raw identifiers: ``struct `Service intervals` `` and ``@Test func `a chain is due after 3000 km`()``. A test file is named for the type or feature it tests, `<Subject>Tests.swift`.
+- **Names are sentences.** Suites are structs named for what they test, and tests are sentences, both with raw identifiers: ``struct `Service intervals` `` and ``@Test func `a chain is due after 3000 km`()``. A test file is named for the type or feature it tests, `<Subject>Tests.swift`. Every test is in a suite, and test and suite names contain no `/`, so the single-test identifier below always has the form `<TestTarget>/<Suite>/<test>()`. A test outside a suite would be `<TestTarget>/<test>()`, and whether `-only-testing:` accepts a `/` inside a raw identifier wasn't checked.
 - **Tables are parameterized.** Rules checked against several inputs use `@Test(arguments:)` instead of a loop or copied tests.
 - **`#require` for preconditions,** such as unwrapping an optional, so the test stops there. `#expect` for everything else.
 - **Each test builds its own state.** A suite's stored properties are set in its `init`, which Swift Testing runs for every test, or the test builds what it needs in its body. No mutable state is shared between tests: `static`s and globals are `Sendable` `let` constants only, such as a fixed date or a sample bike (ADR-0005), so tests run in parallel, Swift Testing's default. `.serialized` only with a comment saying why.
