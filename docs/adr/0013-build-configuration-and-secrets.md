@@ -13,7 +13,7 @@ Earlier ADRs already settle part of it:
 - **ADR-0004.** The project is changed in Xcode, never by hand-editing the `.pbxproj` or with a generator. Package targets' Swift settings go in `Package.swift`. App target settings go "in the Xcode project or in files it references", and whether they live in `.xcconfig` files was left to #21. App resources (asset catalog, `Info.plist`, entitlements) live in `BikeComponents/`, a buildable folder.
 - **ADR-0005.** The app target keeps the template's `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, sets `SWIFT_VERSION = 6` and the `SWIFT_UPCOMING_FEATURE_*` settings for the three upcoming features, and the template's `SWIFT_APPROACHABLE_CONCURRENCY` is removed. Today each of these is a project change, so the user makes it.
 - **ADR-0006.** A tool, a project generator included, needs an accepted ADR.
-- **ADR-0010.** Only the composition root uses system shared instances such as `Bundle.main` (Core does no `Bundle` I/O), and it passes values to adapters through their initializers, with no defaults.
+- **ADR-0010.** System shared instances (such as `URLSession.shared` and `FileManager.default`) are used only in the driven adapters and the composition root, which passes values to adapters through their initializers, with no defaults. Core does no `Bundle` I/O (ADR-0003).
 - **ADR-0011.** The client secret and authorization codes never appear in URLs or error details.
 
 Forces at play:
