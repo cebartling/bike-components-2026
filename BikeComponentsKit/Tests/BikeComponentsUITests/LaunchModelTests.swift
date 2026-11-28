@@ -39,6 +39,20 @@ struct `Launch model` {
         #expect(error as? OpenFailed == OpenFailed())
     }
 
+    @Test func `a failed launch is not retried`() async {
+        let probe = StartProbe()
+        let model = LaunchModel(start: {
+            probe.calls += 1
+            throw OpenFailed()
+        })
+
+        await model.launch()
+        await model.launch()
+
+        #expect(probe.calls == 1)
+        #expect(describe(model.state) == "failed")
+    }
+
     @Test func `the state is opening while start runs`() async {
         let probe = StartProbe()
         let model = LaunchModel(start: {
