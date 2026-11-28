@@ -1,0 +1,54 @@
+// Build settings of the BikeComponents app target, its base configuration for Debug and
+// Release (ADR-0013). The target itself holds no settings: a target-level value beats this
+// file. Edit settings here as text, never in Xcode's Build Settings editor.
+// `//` starts a comment in this file, so write URLs as `https:/$()/host`.
+
+// Product
+PRODUCT_NAME = $(TARGET_NAME)
+PRODUCT_BUNDLE_IDENTIFIER = com.pintailconsultingllc.BikeComponents
+MARKETING_VERSION = 1.0
+CURRENT_PROJECT_VERSION = 1
+
+// Platforms (ADR-0002): iPhone and iPad, the latest iOS release only.
+SDKROOT = auto
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator
+SUPPORTS_MACCATALYST = NO
+TARGETED_DEVICE_FAMILY = 1,2
+IPHONEOS_DEPLOYMENT_TARGET = 27.2
+
+// Signing: automatic until #21 decides. The team ID isn't secret (ADR-0013); another
+// developer overrides it in Secrets.xcconfig.
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM = RDD45JXSRK
+
+// Swift (ADR-0005): Swift 6 mode, main-actor by default, and the three upcoming features.
+// SWIFT_APPROACHABLE_CONCURRENCY is deliberately not set.
+SWIFT_VERSION = 6
+SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+SWIFT_UPCOMING_FEATURE_NONISOLATED_NONSENDING_BY_DEFAULT = YES
+SWIFT_UPCOMING_FEATURE_INFER_ISOLATED_CONFORMANCES = YES
+SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES
+SWIFT_EMIT_LOC_STRINGS = YES
+STRING_CATALOG_GENERATE_SYMBOLS = YES
+
+// Info.plist: generated keys here, other keys in BikeComponents/Info.plist (ADR-0013, ADR-0014).
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = BikeComponents/Info.plist
+// ADR-0015 (for ADR-0014's single window): the scene manifest comes from Info.plist, because a generated one sets
+// UIApplicationSupportsMultipleScenes to true over Info.plist's false.
+INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*] = YES
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*] = YES
+INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*] = YES
+INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*] = YES
+INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*] = UIStatusBarStyleDefault
+INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*] = UIStatusBarStyleDefault
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+
+// The rest of Xcode's template target settings, unchanged.
+ENABLE_PREVIEWS = YES
+LD_RUNPATH_SEARCH_PATHS = @executable_path/Frameworks
+
+// Per-developer values (ADR-0013). Must stay the last line.
+#include? "Secrets.xcconfig"
