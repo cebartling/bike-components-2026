@@ -82,6 +82,11 @@ How per-developer values get into the app:
 - **The user enters the value at runtime, as the reference project does.** Rejected: the Strava client credentials belong to the app's registration, not to the user, and testers would need the secret.
 - **Obfuscating the value in the binary.** Rejected: it can still be extracted, and it adds code.
 
+When a value is missing at launch:
+
+- **Fail the launch (chosen).** Bikes only come from Strava (#4), so a build that can't reach Strava has nothing to show. The failure is immediate and says which value is missing.
+- **Build the app without the adapter and report Strava as not configured.** Rejected: a broken build would look like a user state. ADR-0011's `notConnected` means the user hasn't connected, and a missing client ID isn't something the user can fix. Every screen that imports would also need a case for it.
+
 ### Where this diverges from the reference project
 
 - **Build settings.** The reference project builds with SwiftPM alone and has no Xcode build settings. Its `Info.plist` is committed and the version is stamped when the bundle is built. Here an Xcode project generates `Info.plist`, so the versions and every other target setting live in `Config/BikeComponents.xcconfig`.
@@ -90,7 +95,7 @@ How per-developer values get into the app:
 ## Consequences
 
 - **Easier:** reading and reviewing the app's settings, which are one short text file; ADR-0002's OS bump and ADR-0005's Swift settings, which become text edits an agent can make; adding a per-developer value without touching the project.
-- **Harder:** the skeleton has an extra setup step in Xcode (set the base configuration, delete the target-level settings and the project-level deployment target). Settings Xcode writes later have to be moved by hand. A typo in the include's file name, or a missing file, isn't a build error, so empty values only show at launch. A `//` in a value is silently cut. Without a Strava application of their own, a developer can build and test but not launch the app.
+- **Harder:** the skeleton has an extra setup step in Xcode (set the base configuration, delete the target-level settings and the project-level deployment target). Settings Xcode writes later have to be moved by hand. A typo in the include's file name, or a missing file, isn't a build error, so empty values only show at launch. A `//` in a value is silently cut. Without a Strava application of their own, a developer can build and test but not launch the app. A fresh clone or a new git worktree (agents work in them) has no `Config/Secrets.xcconfig`, so it builds and tests but can't launch until the file is copied in.
 - **ADR-0004.** Its rule against hand-editing the `.pbxproj` stands. Target settings are no longer a project change: they are edits to `Config/BikeComponents.xcconfig`. Setting the base configuration, capabilities, package links, membership exceptions and schemes still are.
 - **ADR-0005.** The app target's `SWIFT_VERSION`, `SWIFT_DEFAULT_ACTOR_ISOLATION` (`MainActor`) and `SWIFT_UPCOMING_FEATURE_*` settings are lines in `Config/BikeComponents.xcconfig`. `SWIFT_APPROACHABLE_CONCURRENCY` isn't set anywhere.
 - **ADR-0002.** A minimum-OS bump edits `IPHONEOS_DEPLOYMENT_TARGET` in `Config/BikeComponents.xcconfig` and the `platforms` in `Package.swift`.
